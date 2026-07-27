@@ -4,12 +4,13 @@
 
 Turn the committed **Playable Core** into a validated, deployable 2D Sites game without expanding the product scope. The child-facing game remains Mexican Spanish, single-player, local-only, and free of ads, purchases, accounts, chat, and analytics.
 
-Read the production package first:
+Read the production package and visual references first:
 
 1. [`outputs/essma-world-production-docs/README.md`](../outputs/essma-world-production-docs/README.md)
 2. [`PRD.md`](../outputs/essma-world-production-docs/PRD.md)
 3. [`ARCHITECTURE.md`](../outputs/essma-world-production-docs/ARCHITECTURE.md)
 4. [`ASSET-BIBLE.md`](../outputs/essma-world-production-docs/ASSET-BIBLE.md)
+5. [`docs/reference-images/README.md`](reference-images/README.md) and the five supplied images it indexes.
 
 ## Current state
 

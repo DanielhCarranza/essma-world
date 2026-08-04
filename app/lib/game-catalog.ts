@@ -127,6 +127,35 @@ export const cameos: readonly CameoDefinition[] = [
 
 export const starterWearableIds = wearables.map((item) => item.id);
 
+/**
+ * A friendly, fully dressed starting point for every friend.  These IDs are
+ * catalog data rather than player data: a profile only records choices that
+ * differ from (or reaffirm) these defaults.
+ */
+export const DEFAULT_LOOKS: Readonly<Record<CharacterId, Readonly<Partial<Record<WearableSlot, string>>>>> = Object.freeze({
+  essma: Object.freeze({
+    outfit: "wearable.essma.vestido-girasol",
+    shoes: "wearable.essma.botitas-camino",
+    accessory: "wearable.essma.diademita-flor",
+  }),
+  juancito: Object.freeze({
+    head: "wearable.juancito.gorrito-aventurero",
+    body: "wearable.juancito.chaleco-bolsitas",
+  }),
+  tori: Object.freeze({
+    head: "wearable.tori.gorrito-hojita",
+    neck: "wearable.tori.panuelo-azul",
+  }),
+  anita: Object.freeze({
+    body: "wearable.anita.chaleco-margarita",
+    neck: "wearable.anita.panuelo-rosa",
+  }),
+});
+
+export function defaultLookFor(characterId: CharacterId): Partial<Record<WearableSlot, string>> {
+  return { ...DEFAULT_LOOKS[characterId] };
+}
+
 export function isCharacterId(value: unknown): value is CharacterId {
   return typeof value === "string" && (CHARACTER_IDS as readonly string[]).includes(value);
 }

@@ -7,7 +7,7 @@ if (!libDir) throw new Error("Set ESSMA_LIB_DIR to the temporary compiled app/li
 const catalog = await import(`${libDir}/game-catalog.js`);
 const profileLib = await import(`${libDir}/player-profile.js`);
 const appearanceLib = await import(`${libDir}/appearance.js`);
-const { CHARACTER_IDS, characters, getWearable, isCompatibleWearable, starterWearableIds, wearables } = catalog;
+const { CHARACTER_IDS, DEFAULT_LOOKS, characters, getWearable, isCompatibleWearable, starterWearableIds, wearables } = catalog;
 const { canEquip, createStarterProfile, PROFILE_SCHEMA_VERSION, validateAndMigrateProfile } = profileLib;
 const { randomizeAppearance, resetAppearance, resolveAppearance } = appearanceLib;
 const NOW = "2026-08-03T12:00:00.000Z";
@@ -22,6 +22,12 @@ test("catalog contains four anchored bases and ten compatible starter wearables"
     assert.ok(characters.find((character) => character.id === item.target).anchors[item.slot]);
     assert.match(item.asset.runtimePath, /^\/assets\/wearables\/v1\//);
     assert.equal(item.asset.provenance.referenceUse, "high-level-direction-only");
+  }
+  for (const characterId of CHARACTER_IDS) {
+    assert.ok(Object.keys(DEFAULT_LOOKS[characterId]).length > 0, `${characterId} needs a default look`);
+    for (const [slot, itemId] of Object.entries(DEFAULT_LOOKS[characterId])) {
+      assert.ok(isCompatibleWearable(characterId, slot, itemId));
+    }
   }
 });
 
@@ -45,7 +51,30 @@ test("a v1 profile migrates to normalized v2 state without unknown items", () =>
   assert.equal(result.profile.appearance.essma.outfit, "wearable.essma.vestido-girasol");
   assert.equal(result.profile.appearance.essma.head, undefined);
   assert.equal(result.profile.appearance.tori.neck, "wearable.tori.panuelo-azul");
+  assert.equal(result.profile.appearance.juancito.body, "wearable.juancito.chaleco-bolsitas");
   assert.deepEqual(result.profile.unlocks.itemIds, starterWearableIds);
+});
+
+test("starter, legacy, and reset looks are dressed while explicit equipment is preserved", () => {
+  const starter = createStarterProfile(NOW);
+  assert.deepEqual(starter.appearance.essma, DEFAULT_LOOKS.essma);
+  assert.deepEqual(starter.appearance.anita, DEFAULT_LOOKS.anita);
+
+  const migrated = validateAndMigrateProfile({
+    schemaVersion: 2,
+    profileId: "local-primary",
+    createdAt: NOW,
+    updatedAt: NOW,
+    settings: { music: true, sfx: true, reducedMotion: false },
+    unlocks: { itemIds: starterWearableIds, companionIds: [], regionIds: [] },
+    appearance: { essma: { outfit: "wearable.essma.vestido-girasol", shoes: "wearable.essma.botitas-camino" } },
+  }, NOW);
+  assert.equal(migrated.ok, true);
+  if (!migrated.ok) return;
+  assert.equal(migrated.profile.schemaVersion, PROFILE_SCHEMA_VERSION);
+  assert.equal(migrated.profile.appearance.essma.outfit, "wearable.essma.vestido-girasol");
+  assert.equal(migrated.profile.appearance.essma.accessory, "wearable.essma.diademita-flor");
+  assert.equal(migrated.profile.appearance.tori.head, "wearable.tori.gorrito-hojita");
 });
 
 test("invalid v2 imports are rejected instead of normalized into a replacement", () => {
@@ -70,8 +99,12 @@ test("the shared resolver, reset, and randomize helpers only produce compatible 
   profile.appearance.essma.outfit = "wearable.essma.vestido-girasol";
   const resolved = resolveAppearance(profile.appearance, "essma");
   assert.equal(resolved.character.id, "essma");
-  assert.deepEqual(resolved.layers.map((item) => item.id), ["wearable.essma.vestido-girasol"]);
-  assert.deepEqual(resetAppearance(profile.appearance, "essma").essma, {});
+  assert.deepEqual(resolved.layers.map((item) => item.id), [
+    "wearable.essma.vestido-girasol",
+    "wearable.essma.botitas-camino",
+    "wearable.essma.diademita-flor",
+  ]);
+  assert.deepEqual(resetAppearance(profile.appearance, "essma").essma, DEFAULT_LOOKS.essma);
   const randomized = randomizeAppearance(profile, "tori", () => 0.9);
   assert.ok(Object.values(randomized.tori).every((id) => id?.startsWith("wearable.tori.")));
 });

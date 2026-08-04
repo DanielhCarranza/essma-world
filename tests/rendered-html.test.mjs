@@ -51,6 +51,9 @@ test("replaces the disposable starter preview", async () => {
 
   assert.match(profileStore, /indexedDB/);
   assert.match(page, /Rancho de Essma/);
+  assert.match(page, /¿A quién vestimos hoy\?/);
+  assert.match(page, /El mapa del granero/);
+  assert.match(page, /Próximamente/);
   assert.match(page, /Mantén presionado 2 segundos/);
   assert.match(page, /MiniGame|Colección|Opciones para adultos/);
   assert.match(layout, /Essma World/);

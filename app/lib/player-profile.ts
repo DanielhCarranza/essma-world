@@ -1,6 +1,6 @@
-import { CHARACTER_IDS, CharacterId, getWearable, isCharacterId, isCompatibleWearable, starterWearableIds, WearableSlot } from "./game-catalog.js";
+import { CHARACTER_IDS, CharacterId, defaultLookFor, getWearable, isCharacterId, isCompatibleWearable, starterWearableIds, WearableSlot } from "./game-catalog.js";
 
-export const PROFILE_SCHEMA_VERSION = 2;
+export const PROFILE_SCHEMA_VERSION = 3;
 export const LOCAL_PROFILE_ID = "local-primary" as const;
 
 export type ProfileSettings = { music: boolean; sfx: boolean; reducedMotion: boolean };
@@ -21,6 +21,16 @@ type LegacyProfileV1 = {
   profileId: typeof LOCAL_PROFILE_ID;
   appearance: unknown;
   settings: unknown;
+};
+
+type LegacyProfileV2 = {
+  schemaVersion: 2;
+  profileId: typeof LOCAL_PROFILE_ID;
+  createdAt: unknown;
+  updatedAt: unknown;
+  settings: unknown;
+  unlocks: unknown;
+  appearance: unknown;
 };
 
 export type ProfileValidationResult = { ok: true; profile: PlayerProfile } | { ok: false; reason: string };
@@ -52,7 +62,11 @@ function normalizeAppearance(value: unknown, unlockedItemIds: ReadonlySet<string
   const input = isRecord(value) ? value : {};
   return Object.fromEntries(CHARACTER_IDS.map((characterId) => {
     const inputLook = isRecord(input[characterId]) ? input[characterId] : {};
-    const look: Partial<Record<WearableSlot, string>> = {};
+    // Start every friend dressed. Explicit, compatible player choices then
+    // replace only their matching slots, retaining the rest of the look.
+    const look: Partial<Record<WearableSlot, string>> = Object.fromEntries(
+      Object.entries(defaultLookFor(characterId)).filter(([, itemId]) => unlockedItemIds.has(itemId)),
+    ) as Partial<Record<WearableSlot, string>>;
     for (const [slot, itemId] of Object.entries(inputLook)) {
       if (isCompatibleWearable(characterId, slot as WearableSlot, itemId) && unlockedItemIds.has(itemId)) look[slot as WearableSlot] = itemId;
     }
@@ -75,7 +89,9 @@ export function createStarterProfile(now = new Date().toISOString()): PlayerProf
 /** Normalizes only data that has already passed the import's structural checks. */
 export function normalizeProfile(value: PlayerProfile): PlayerProfile {
   const unlockedItemIds = normalizeIds(value.unlocks.itemIds, new Set(starterWearableIds));
-  const usableUnlocks = unlockedItemIds.length ? unlockedItemIds : [...starterWearableIds];
+  // Starter clothes are always available; a partial historical unlock list
+  // must not turn a friend's catalog-backed default look into a bare base.
+  const usableUnlocks = [...new Set([...starterWearableIds, ...unlockedItemIds])];
   return {
     schemaVersion: PROFILE_SCHEMA_VERSION,
     profileId: LOCAL_PROFILE_ID,
@@ -110,6 +126,20 @@ function migrateV1(value: LegacyProfileV1, now: string): ProfileValidationResult
   return { ok: true, profile };
 }
 
+function migrateV2(value: LegacyProfileV2): ProfileValidationResult {
+  if (!isIsoDate(value.createdAt) || !isIsoDate(value.updatedAt) || !isRecord(value.settings) || !isRecord(value.unlocks) || !isRecord(value.appearance)) return { ok: false, reason: "malformed-profile" };
+  const rawItems = value.unlocks.itemIds;
+  if (!Array.isArray(rawItems) || rawItems.some((id) => typeof id !== "string" || !getWearable(id))) return { ok: false, reason: "invalid-unlock" };
+  for (const characterId of CHARACTER_IDS) {
+    const look = value.appearance[characterId];
+    if (look !== undefined && !isRecord(look)) return { ok: false, reason: "malformed-appearance" };
+    if (isRecord(look)) for (const [slot, itemId] of Object.entries(look)) {
+      if (!isCompatibleWearable(characterId, slot as WearableSlot, itemId) || !rawItems.includes(itemId)) return { ok: false, reason: "invalid-appearance" };
+    }
+  }
+  return { ok: true, profile: normalizeProfile({ ...value, schemaVersion: PROFILE_SCHEMA_VERSION } as PlayerProfile) };
+}
+
 /**
  * The single validation entry point for IndexedDB reads and parent backups.
  * A false result means callers must leave their currently saved profile intact.
@@ -117,6 +147,7 @@ function migrateV1(value: LegacyProfileV1, now: string): ProfileValidationResult
 export function validateAndMigrateProfile(value: unknown, now = new Date().toISOString()): ProfileValidationResult {
   if (!isRecord(value)) return { ok: false, reason: "malformed-profile" };
   if (value.schemaVersion === 1 && value.profileId === LOCAL_PROFILE_ID) return migrateV1(value as LegacyProfileV1, now);
+  if (value.schemaVersion === 2 && value.profileId === LOCAL_PROFILE_ID) return migrateV2(value as LegacyProfileV2);
   return validateV2(value);
 }
 

@@ -1,4 +1,4 @@
-import { characters, CharacterDefinition, CharacterId, getWearable, WearableDefinition } from "./game-catalog.js";
+import { characters, CharacterDefinition, CharacterId, defaultLookFor, getWearable, WearableDefinition } from "./game-catalog.js";
 import { Appearance, PlayerProfile } from "./player-profile.js";
 
 export type ResolvedAppearance = Readonly<{
@@ -18,12 +18,12 @@ export function resolveAppearance(appearance: Appearance, characterId: Character
 }
 
 export function resetAppearance(appearance: Appearance, characterId: CharacterId): Appearance {
-  return { ...appearance, [characterId]: {} };
+  return { ...appearance, [characterId]: defaultLookFor(characterId) };
 }
 
 export function randomizeAppearance(profile: PlayerProfile, characterId: CharacterId, random = Math.random): Appearance {
   const choices = profile.unlocks.itemIds.map(getWearable).filter((item): item is WearableDefinition => Boolean(item && item.target === characterId));
-  const next: Appearance[CharacterId] = {};
+  const next: Appearance[CharacterId] = defaultLookFor(characterId);
   for (const item of choices) {
     if (!(item.slot in next) || random() >= 0.5) next[item.slot] = item.id;
   }

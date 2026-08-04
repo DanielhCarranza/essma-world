@@ -61,3 +61,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .map-place em { font-style: normal; opacity: .75; }.map-place button { border: 0; border-radius: 8px; padding: 7px 9px; color: #fff8e8; background: #4f773d; font-weight: 850; }
 @media (max-width: 760px) { .preview-card .character-art { width: 210px; height: 210px; margin-bottom: 30px; }.scene-accessibility { z-index: 14; left: 0; bottom: 57px; transform: none; width: 100%; padding: 8px 10px; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; overscroll-behavior-inline: contain; background: linear-gradient(90deg, #75412bf2, #5d3327f2); scrollbar-width: thin; }.scene-accessibility p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }.scene-accessibility button { flex: 0 0 auto; font-size: 11px; padding: 7px 10px; }.quick-actions { gap: 6px; }.quick-actions button { min-width: 60px; } }
 @media (max-width: 760px) { .first-play-guide { left: 12px; bottom: 129px; padding: 12px; }.first-play-guide strong { font-size: 19px; }.first-play-guide span { font-size: 12px; margin-bottom: 9px; } }
+
+/* Canvas controls stay available to keyboard users without duplicating every
+   visual action on top of the ranch. They expand only when keyboard focus
+   enters the control group. */
+.quick-actions small { font-size: 11px; }
+.scene-accessibility { z-index: 15; left: 50%; bottom: 78px; transform: translateX(-50%); width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.scene-accessibility:focus-within { width: min(720px, calc(100% - 24px)); height: auto; min-height: 44px; overflow: visible; clip: auto; white-space: normal; padding: 8px; border: 2px solid #fff0cf; border-radius: 15px; background: #75412bf5; box-shadow: 0 4px 0 #4e2b22; }
+@media (max-width: 760px) { .scene-accessibility { bottom: 63px; }.scene-accessibility:focus-within { left: 12px; transform: none; width: calc(100% - 24px); max-height: 136px; overflow: auto; justify-content: flex-start; } }

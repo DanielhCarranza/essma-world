@@ -41,23 +41,27 @@ test("server-renders Essma World", async () => {
 });
 
 test("replaces the disposable starter preview", async () => {
-  const [page, profileStore, layout, css, packageJson] = await Promise.all([
+  const [page, worldMap, ranchScene, profileStore, layout, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/world-map.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/ranch-scene.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/lib/profile-store.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
   assert.match(profileStore, /indexedDB/);
-  assert.match(page, /Rancho de Essma/);
-  assert.match(page, /¿A quién vestimos hoy\?/);
-  assert.match(page, /El mapa del granero/);
-  assert.match(page, /Próximamente/);
+  assert.match(page, /WorldMap/);
+  assert.match(worldMap, /Rancho/);
+  assert.match(worldMap, /Desierto/);
+  assert.match(worldMap, /Pueblo/);
+  assert.match(worldMap, /Bosque/);
+  assert.match(worldMap, /Toca el Rancho/);
+  assert.match(worldMap, /Próximamente|Pronto/);
   assert.match(page, /Mantén presionado 2 segundos/);
   assert.match(page, /MiniGame|Colección|Opciones para adultos/);
   assert.match(layout, /Essma World/);
-  assert.match(css, /rancho-de-essma-v1\.png/);
+  assert.match(ranchScene, /rancho-de-essma-v1\.png/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.doesNotMatch(packageJson, /three/);
 

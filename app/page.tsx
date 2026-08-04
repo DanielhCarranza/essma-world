@@ -1,239 +1,150 @@
 "use client";
 
-import {
-  ChangeEvent,
-  CSSProperties,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import RanchScene, { RanchEvent } from "./ranch-scene";
+import { cameos, characters, CharacterId, getWearable, wearables, WearableSlot } from "./lib/game-catalog";
+import { Appearance, canEquip, createStarterProfile, PlayerProfile, validateAndMigrateProfile } from "./lib/player-profile";
+import { readSavedProfile, writeSavedProfile } from "./lib/profile-store";
+import { randomizeAppearance, resetAppearance, resolveAppearance } from "./lib/appearance";
 
-type CharacterId = "essma" | "juancito" | "tori" | "anita";
-type Slot = "hair" | "outfit" | "shoes" | "accessory" | "head" | "neck" | "body";
+type Screen = "ranch" | "dress";
+type Dialog = "settings" | "collection" | "adult" | "confirm-import" | null;
 
-type Wearable = {
-  id: string;
-  target: CharacterId;
-  slot: Slot;
-  name: string;
-  icon: string;
-  color: string;
-};
+const slotNames: Record<WearableSlot, string> = { hair: "Peinado", outfit: "Ropa", shoes: "Botitas", accessory: "Accesorio", head: "Cabeza", neck: "Cuello", body: "Cuerpo" };
+const cameoMessages = {
+  map: "En el granero hay un mapa antiguo. ¡Algún día nos llevará a una aventura!",
+  flowers: "¡Mira las flores del desierto! Guardan colores para los días bonitos.",
+  loro: "Loro Loco llega pronto con una historia alegre para el rancho.",
+  oso: "Oso Taquito llegará pronto para compartir una merienda imaginaria.",
+  capybara: "Capybara llegará pronto para descansar junto al arroyo.",
+} as const;
 
-type Profile = {
-  schemaVersion: 1;
-  profileId: "local-primary";
-  appearance: Record<CharacterId, Partial<Record<Slot, string>>>;
-  settings: { music: boolean; sfx: boolean; reducedMotion: boolean };
-};
+function characterById(id: CharacterId) { return characters.find((character) => character.id === id)!; }
 
-const characters: Record<CharacterId, { name: string; kind: string; icon: string; color: string }> = {
-  essma: { name: "Essma", kind: "Exploradora del rancho", icon: "🌻", color: "#ef8d46" },
-  juancito: { name: "Juancito", kind: "Perrito de la pradera", icon: "🐿️", color: "#98a84a" },
-  tori: { name: "Tori", kind: "Cacomixtle", icon: "🦝", color: "#5c8ba8" },
-  anita: { name: "Anita", kind: "Vaquita", icon: "🐮", color: "#d87787" },
-};
-
-const wearables: Wearable[] = [
-  { id: "wearable.essma.trenza-cobre", target: "essma", slot: "hair", name: "Trenza cobriza", icon: "🎀", color: "#9a4e32" },
-  { id: "wearable.essma.vestido-girasol", target: "essma", slot: "outfit", name: "Vestido girasol", icon: "👗", color: "#f3b437" },
-  { id: "wearable.essma.botitas-camino", target: "essma", slot: "shoes", name: "Botitas de camino", icon: "👢", color: "#83513b" },
-  { id: "wearable.essma.diademita-flor", target: "essma", slot: "accessory", name: "Diademita de flor", icon: "🌸", color: "#d65a7d" },
-  { id: "wearable.juancito.gorrito-aventurero", target: "juancito", slot: "head", name: "Gorrito aventurero", icon: "🧢", color: "#c47d2b" },
-  { id: "wearable.juancito.chaleco-bolsitas", target: "juancito", slot: "body", name: "Chaleco con bolsitas", icon: "🦺", color: "#d59a43" },
-  { id: "wearable.tori.panuelo-azul", target: "tori", slot: "neck", name: "Pañuelo azul", icon: "🔷", color: "#3477b9" },
-  { id: "wearable.tori.gorrito-hojita", target: "tori", slot: "head", name: "Gorrito de hojita", icon: "🍃", color: "#548a48" },
-  { id: "wearable.anita.chaleco-margarita", target: "anita", slot: "body", name: "Chaleco margarita", icon: "🌼", color: "#f0cd61" },
-  { id: "wearable.anita.panuelo-rosa", target: "anita", slot: "neck", name: "Pañuelo rosa", icon: "🩷", color: "#d96284" },
-];
-
-const starterProfile = (): Profile => ({
-  schemaVersion: 1,
-  profileId: "local-primary",
-  appearance: { essma: {}, juancito: {}, tori: {}, anita: {} },
-  settings: { music: true, sfx: true, reducedMotion: false },
-});
-
-function openProfileDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("essma-world", 1);
-    request.onupgradeneeded = () => {
-      if (!request.result.objectStoreNames.contains("profiles")) request.result.createObjectStore("profiles");
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+function CharacterArt({ characterId, appearance, compact = false }: { characterId: CharacterId; appearance: Appearance[CharacterId]; compact?: boolean }) {
+  const resolved = resolveAppearance({ [characterId]: appearance } as Appearance, characterId);
+  const character = resolved.character;
+  const [baseFailed, setBaseFailed] = useState(false);
+  const layers = resolved.layers;
+  return <div className={`character-art ${compact ? "character-art-compact" : ""}`} role="img" aria-label={character.asset.alt}>
+    {layers.map((item) => item!.slot === "hair" && <img key={item!.id} className="character-layer" style={{ zIndex: item!.zIndex }} src={item!.asset.runtimePath} alt="" />)}
+    {!baseFailed ? <img className="character-base" style={{ zIndex: 20 }} src={character.asset.runtimePath} alt="" onError={() => setBaseFailed(true)} /> : <span className="character-fallback" aria-hidden="true">{characterId === "essma" ? "✦" : "♥"}</span>}
+    {layers.map((item) => item!.slot !== "hair" && <img key={item!.id} className="character-layer" style={{ zIndex: item!.zIndex }} src={item!.asset.runtimePath} alt="" />)}
+  </div>;
 }
 
-async function readProfile(): Promise<Profile | null> {
-  const db = await openProfileDb();
-  return new Promise((resolve, reject) => {
-    const request = db.transaction("profiles", "readonly").objectStore("profiles").get("local-primary");
-    request.onsuccess = () => resolve(isProfile(request.result) ? request.result : null);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function writeProfile(profile: Profile) {
-  const db = await openProfileDb();
-  return new Promise<void>((resolve, reject) => {
-    const transaction = db.transaction("profiles", "readwrite");
-    transaction.objectStore("profiles").put(profile, "local-primary");
-    transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error);
-  });
-}
-
-function isProfile(value: unknown): value is Profile {
-  if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<Profile>;
-  return candidate.schemaVersion === 1 && candidate.profileId === "local-primary" && !!candidate.appearance && !!candidate.settings;
-}
-
-function slotLabel(slot: Slot) {
-  return { hair: "Peinado", outfit: "Ropa", shoes: "Botitas", accessory: "Accesorios", head: "Cabeza", neck: "Cuello", body: "Cuerpo" }[slot];
-}
-
-function CharacterDoll({ character, appearance, compact = false }: { character: CharacterId; appearance: Partial<Record<Slot, string>>; compact?: boolean }) {
-  const chosen = Object.values(appearance).map((id) => wearables.find((item) => item.id === id)).filter(Boolean) as Wearable[];
-  const itemFor = (slot: Slot) => chosen.find((item) => item.slot === slot);
-  const record = characters[character];
-  return (
-    <div className={`doll doll-${character} ${compact ? "doll-compact" : ""}`} aria-label={`${record.name}, ${record.kind}`}>
-      <div className="doll-sun" />
-      <div className="doll-head">{character === "essma" ? <><span className="essma-hair">〰〰</span><span className="essma-bow">🎀</span></> : <span className="animal-face">{record.icon}</span>}</div>
-      {itemFor("head") && <span className="doll-item doll-head-item" style={{ background: itemFor("head")?.color }}>{itemFor("head")?.icon}</span>}
-      {itemFor("hair") && <span className="doll-item doll-hair-item" style={{ background: itemFor("hair")?.color }}>{itemFor("hair")?.icon}</span>}
-      <div className="doll-body" style={{ "--doll-color": record.color } as CSSProperties}>
-        <span className="doll-base-icon">{character === "essma" ? "✦" : "♥"}</span>
-      </div>
-      {itemFor("outfit") && <span className="doll-item doll-outfit-item" style={{ background: itemFor("outfit")?.color }}>{itemFor("outfit")?.icon}</span>}
-      {itemFor("body") && <span className="doll-item doll-outfit-item" style={{ background: itemFor("body")?.color }}>{itemFor("body")?.icon}</span>}
-      {itemFor("neck") && <span className="doll-item doll-neck-item" style={{ background: itemFor("neck")?.color }}>{itemFor("neck")?.icon}</span>}
-      {itemFor("accessory") && <span className="doll-item doll-accessory-item" style={{ background: itemFor("accessory")?.color }}>{itemFor("accessory")?.icon}</span>}
-      {itemFor("shoes") && <span className="doll-item doll-shoes-item" style={{ background: itemFor("shoes")?.color }}>{itemFor("shoes")?.icon}</span>}
-    </div>
-  );
+function useSound(settings: PlayerProfile["settings"]) {
+  const musicRef = useRef<HTMLAudioElement | null>(null);
+  const ambienceRef = useRef<HTMLAudioElement | null>(null);
+  const play = (name: "confirm" | "cancel") => {
+    if (!settings.sfx) return;
+    const audio = new Audio(`/assets/audio/v1/${name}.wav`);
+    audio.volume = 0.42;
+    void audio.play().catch(() => undefined);
+  };
+  const toggleMusic = () => {
+    if (!settings.music) return;
+    if (!musicRef.current) { musicRef.current = new Audio("/assets/audio/v1/ranch-loop.wav"); musicRef.current.loop = true; musicRef.current.volume = 0.18; }
+    if (!ambienceRef.current) { ambienceRef.current = new Audio("/assets/audio/v1/ambience.wav"); ambienceRef.current.loop = true; ambienceRef.current.volume = 0.08; }
+    void musicRef.current.play().catch(() => undefined);
+    void ambienceRef.current.play().catch(() => undefined);
+  };
+  useEffect(() => { if (!settings.music) { musicRef.current?.pause(); ambienceRef.current?.pause(); } }, [settings.music]);
+  useEffect(() => () => { musicRef.current?.pause(); ambienceRef.current?.pause(); }, []);
+  return { play, toggleMusic };
 }
 
 export default function Home() {
-  const [screen, setScreen] = useState<"ranch" | "dress">("ranch");
+  const [screen, setScreen] = useState<Screen>("ranch");
   const [selected, setSelected] = useState<CharacterId>("essma");
-  const [profile, setProfile] = useState<Profile>(starterProfile);
+  const [profile, setProfile] = useState<PlayerProfile>(() => createStarterProfile());
   const [hydrated, setHydrated] = useState(false);
-  const [notice, setNotice] = useState("¡Hola, Essma! ¿A quién vestimos hoy?");
-  const [showSettings, setShowSettings] = useState(false);
+  const [notice, setNotice] = useState("¡Hola! Elige un amigo en el rancho para empezar a vestir.");
+  const [activeCameo, setActiveCameo] = useState<"loro" | "oso" | "capybara" | null>(null);
+  const [dialog, setDialog] = useState<Dialog>(null);
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [pendingImport, setPendingImport] = useState<PlayerProfile | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastFocusRef = useRef<HTMLElement | null>(null);
+  const { play, toggleMusic } = useSound(profile.settings);
 
   useEffect(() => {
-    readProfile().then((saved) => { if (saved) setProfile(saved); }).catch(() => setNotice("Tu estilo se guardará cuando este dispositivo esté listo.")).finally(() => setHydrated(true));
+    readSavedProfile().then((saved) => {
+      if (saved) { setProfile(saved); setNotice("¡Qué gusto verte de nuevo en el Rancho de Essma!"); }
+    }).catch(() => setNotice("Tu estilo se guardará cuando este dispositivo esté listo.")).finally(() => setHydrated(true));
   }, []);
 
   useEffect(() => {
-    if (hydrated) void writeProfile(profile).catch(() => setNotice("No pudimos guardar todavía. Puedes seguir jugando."));
-  }, [profile, hydrated]);
+    if (hydrated) void writeSavedProfile(profile).catch(() => setNotice("No pudimos guardar todavía. Puedes seguir jugando."));
+  }, [hydrated, profile]);
 
-  const selectedItems = useMemo(() => wearables.filter((item) => item.target === selected), [selected]);
+  useEffect(() => {
+    if (!dialog) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") closeDialog(); };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  });
+
+  function openDialog(next: Exclude<Dialog, null>, trigger?: HTMLElement) { lastFocusRef.current = trigger ?? document.activeElement as HTMLElement; setDialog(next); }
+  function closeDialog() { setDialog(null); setPendingImport(null); setHoldProgress(0); requestAnimationFrame(() => lastFocusRef.current?.focus()); }
+  function updateProfile(update: (current: PlayerProfile) => PlayerProfile) { setProfile((current) => ({ ...update(current), updatedAt: new Date().toISOString() })); }
+  const selectedItems = useMemo(() => wearables.filter((item) => item.target === selected && profile.unlocks.itemIds.includes(item.id)), [profile.unlocks.itemIds, selected]);
   const availableSlots = useMemo(() => [...new Set(selectedItems.map((item) => item.slot))], [selectedItems]);
 
-  function openDress(character: CharacterId) {
-    setSelected(character);
-    setScreen("dress");
-    setNotice(`¡Vamos a vestir a ${characters[character].name}!`);
-  }
-
+  function openDress(character: CharacterId) { setSelected(character); setScreen("dress"); setNotice(`¡Vamos a vestir a ${characterById(character).locale["es-MX"].name}!`); play("confirm"); }
   function handleRanchEvent(event: RanchEvent) {
-    if (event.type === "choose-character") {
-      openDress(event.character);
-      return;
-    }
-
-    const messages = {
-      map: "En el granero hay un mapa antiguo. ¡Algún día nos llevará a una aventura!",
-      flowers: "¡Mira las flores del desierto!",
-      cameo: "¡Muy pronto conocerás a Loro Loco!",
-    };
-    setNotice(messages[event.story]);
+    if (event.type === "choose-character") return openDress(event.character);
+    setNotice(cameoMessages[event.story]);
+    if (event.story === "loro" || event.story === "oso" || event.story === "capybara") setActiveCameo(event.story);
+    if (event.story === "map" || event.story === "flowers") play("confirm");
   }
-
-  function equip(item: Wearable) {
-    setProfile((current) => ({ ...current, appearance: { ...current.appearance, [item.target]: { ...current.appearance[item.target], [item.slot]: item.id } } }));
-    setNotice(`¡Listo! A ${characters[item.target].name} le encanta su ${item.name.toLowerCase()}.`);
+  function equip(itemId: string) {
+    const item = getWearable(itemId);
+    if (!item || !canEquip(profile, selected, item.slot, itemId)) return;
+    updateProfile((current) => ({ ...current, appearance: { ...current.appearance, [selected]: { ...current.appearance[selected], [item.slot]: itemId } } }));
+    setNotice(`¡Listo! A ${characterById(selected).locale["es-MX"].name} le encanta ${item.locale["es-MX"].name.toLowerCase()}.`);
+    play("confirm");
   }
-
-  function resetLook() {
-    setProfile((current) => ({ ...current, appearance: { ...current.appearance, [selected]: {} } }));
-    setNotice(`El look de ${characters[selected].name} volvió a empezar.`);
-  }
-
+  function resetLook() { updateProfile((current) => ({ ...current, appearance: resetAppearance(current.appearance, selected) })); setNotice(`El look de ${characterById(selected).locale["es-MX"].name} volvió a empezar.`); play("cancel"); }
   function surprise() {
-    const next: Partial<Record<Slot, string>> = {};
-    availableSlots.forEach((slot) => {
-      const choices = selectedItems.filter((item) => item.slot === slot);
-      next[slot] = choices[Math.floor(Math.random() * choices.length)]?.id;
-    });
-    setProfile((current) => ({ ...current, appearance: { ...current.appearance, [selected]: next } }));
-    setNotice("¡Qué sorpresa! Mira ese nuevo estilo.");
+    updateProfile((current) => ({ ...current, appearance: randomizeAppearance(current, selected) }));
+    setNotice("¡Qué sorpresa! Mira ese nuevo estilo."); play("confirm");
   }
-
+  function toggleSetting(key: keyof PlayerProfile["settings"]) { updateProfile((current) => ({ ...current, settings: { ...current.settings, [key]: !current.settings[key] } })); }
   function exportBackup() {
     const blob = new Blob([JSON.stringify(profile, null, 2)], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "essma-world-respaldo.json";
-    link.click();
-    URL.revokeObjectURL(link.href);
-    setNotice("Tu respaldo está listo.");
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "essma-world-respaldo.json"; link.click(); URL.revokeObjectURL(link.href);
+    setNotice("El respaldo está listo. Guárdalo con una persona adulta."); closeDialog();
+  }
+  async function importBackup(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
+    try { const result = validateAndMigrateProfile(JSON.parse(await file.text())); if (!result.ok) throw new Error(result.reason); setPendingImport(result.profile); setDialog("confirm-import"); }
+    catch { setNotice("Ese archivo no es un respaldo compatible de Essma World. Tu estilo actual sigue seguro."); }
+  }
+  function replaceWithBackup() { if (!pendingImport) return; setProfile(pendingImport); setNotice("¡El respaldo está listo para jugar!"); play("confirm"); closeDialog(); }
+  function startAdultHold() {
+    const started = performance.now();
+    let frame = 0;
+    const advance = (now: number) => { const progress = Math.min(1, (now - started) / 2000); setHoldProgress(progress); if (progress >= 1) { setDialog("adult"); return; } frame = requestAnimationFrame(advance); };
+    frame = requestAnimationFrame(advance);
+    const stop = () => { cancelAnimationFrame(frame); setHoldProgress(0); window.removeEventListener("pointerup", stop); window.removeEventListener("pointercancel", stop); };
+    window.addEventListener("pointerup", stop, { once: true }); window.addEventListener("pointercancel", stop, { once: true });
   }
 
-  function importBackup(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const next = JSON.parse(String(reader.result));
-        if (!isProfile(next)) throw new Error("invalid");
-        if (window.confirm("¿Reemplazar el estilo guardado en este dispositivo?")) {
-          setProfile(next);
-          setNotice("¡El respaldo está listo para jugar!");
-        }
-      } catch { setNotice("Ese archivo no es un respaldo de Essma World."); }
-    };
-    reader.readAsText(file);
-    event.target.value = "";
-  }
-
-  const toggleSetting = (key: keyof Profile["settings"]) => setProfile((current) => ({ ...current, settings: { ...current.settings, [key]: !current.settings[key] } }));
-
-  return (
-    <main className={`game-shell ${profile.settings.reducedMotion ? "reduce-motion" : ""}`}>
-      <header className="topbar">
-        <button className="brand" onClick={() => setScreen("ranch")} aria-label="Volver al Rancho de Essma"><span>ESSMA</span><small>WORLD</small></button>
-        <div className="topbar-right"><span className="sun-chip">☀ Rancho de Essma</span><button className="round-button" onClick={() => setShowSettings(true)} aria-label="Abrir ajustes">⚙</button></div>
-      </header>
-
-      <section className={`play-area ${screen === "dress" ? "is-dressing" : ""}`}>
-        <div className="ranch-stage" aria-hidden={screen === "dress"}>
-          <RanchScene selectedCharacter={selected} reducedMotion={profile.settings.reducedMotion} onEvent={handleRanchEvent} />
-        </div>
-
-        {screen === "dress" && <section className="dress-room" aria-label="Vestir">
-          <div className="dress-room-head"><button className="back-button" onClick={() => setScreen("ranch")}>← <span>Rancho</span></button><div><p>VESTIR</p><h1>{characters[selected].name}</h1></div><button className="done-button" onClick={() => setScreen("ranch")}>¡Listo! ✓</button></div>
-          <div className="dress-grid">
-            <aside className="friend-selector" aria-label="Elige a un amigo">{(Object.keys(characters) as CharacterId[]).map((id) => <button key={id} className={id === selected ? "selected" : ""} onClick={() => { setSelected(id); setNotice(`Ahora vestimos a ${characters[id].name}.`); }}><CharacterDoll character={id} appearance={profile.appearance[id]} compact /><span>{characters[id].name}</span></button>)}</aside>
-            <section className="preview-card"><div className="sunbeam" /><CharacterDoll character={selected} appearance={profile.appearance[selected]} /><p>{characters[selected].kind}</p><div className="look-slots">{availableSlots.map((slot) => <span key={slot}>{slotLabel(slot)}</span>)}</div></section>
-            <section className="closet" aria-label="Ropita y accesorios"><div className="closet-heading"><div><p>EL CLÓSET DE</p><h2>{characters[selected].name.toUpperCase()}</h2></div><button onClick={surprise}>✦ Sorpresa</button></div><div className="item-grid">{selectedItems.map((item) => { const equipped = profile.appearance[selected][item.slot] === item.id; return <button key={item.id} className={`item-card ${equipped ? "equipped" : ""}`} onClick={() => equip(item)} aria-pressed={equipped}><span className="item-icon" style={{ background: item.color }}>{item.icon}</span><span>{item.name}</span><small>{slotLabel(item.slot)}</small></button>; })}</div><div className="closet-footer"><button onClick={resetLook}>↺ Reiniciar</button><span>{hydrated ? "Guardado en este dispositivo" : "Preparando tu baúl…"}</span></div></section>
-          </div>
-        </section>}
-      </section>
-
-      <aside className="message-card" aria-live="polite"><span>✦</span><p>{notice}</p></aside>
-      <nav className="quick-actions" aria-label="Acciones principales"><button onClick={() => setScreen("ranch")}>🏡 <span>Rancho</span></button><button onClick={() => openDress("essma")}>👗 <span>Vestir</span></button><button onClick={() => setNotice("Tu colección crecerá con futuras aventuras.")}>🎒 <span>Colección</span></button></nav>
-
-      {showSettings && <div className="modal-backdrop" role="presentation" onMouseDown={() => setShowSettings(false)}><section className="settings-card" role="dialog" aria-modal="true" aria-label="Ajustes" onMouseDown={(event) => event.stopPropagation()}><div className="settings-heading"><div><p>RANCHO DE ESSMA</p><h2>Ajustes</h2></div><button onClick={() => setShowSettings(false)} aria-label="Cerrar ajustes">×</button></div><label><span>🎵 Música</span><input type="checkbox" checked={profile.settings.music} onChange={() => toggleSetting("music")} /></label><label><span>🔔 Sonidos</span><input type="checkbox" checked={profile.settings.sfx} onChange={() => toggleSetting("sfx")} /></label><label><span>🌙 Movimiento suave</span><input type="checkbox" checked={profile.settings.reducedMotion} onChange={() => toggleSetting("reducedMotion")} /></label><div className="backup-box"><p><b>Solo adultos</b><br />Guarda una copia de tus estilos en este dispositivo.</p><div><button onClick={exportBackup}>⇩ Guardar respaldo</button><button onClick={() => inputRef.current?.click()}>⇧ Abrir respaldo</button></div><input ref={inputRef} type="file" accept="application/json" onChange={importBackup} hidden /></div></section></div>}
-    </main>
-  );
+  return <main className={`game-shell ${profile.settings.reducedMotion ? "reduce-motion" : ""}`}>
+    <header className="topbar"><button className="brand" onClick={() => setScreen("ranch")} aria-label="Volver al Rancho de Essma"><span>ESSMA</span><small>WORLD</small></button><div className="topbar-right"><span className="sun-chip">☀ Rancho de Essma</span><button className="round-button" onClick={(event) => openDialog("settings", event.currentTarget)} aria-label="Abrir ajustes">⚙</button></div></header>
+    <section className={`play-area ${screen === "dress" ? "is-dressing" : ""}`}>
+      {screen === "ranch" && <div className="ranch-stage"><RanchScene appearance={profile.appearance} selectedCharacter={selected} reducedMotion={profile.settings.reducedMotion} onEvent={handleRanchEvent} /></div>}
+      {screen === "dress" && <section className="dress-room" aria-label="Vestir"><div className="dress-room-head"><button className="back-button" onClick={() => setScreen("ranch")}>← <span>Rancho</span></button><div><p>VESTIR</p><h1>{characterById(selected).locale["es-MX"].name}</h1></div><button className="done-button" onClick={() => setScreen("ranch")}>¡Listo! ✓</button></div><div className="dress-grid"><aside className="friend-selector" aria-label="Elige a un amigo">{characters.map((character) => <button key={character.id} className={character.id === selected ? "selected" : ""} onClick={() => openDress(character.id)}><CharacterArt characterId={character.id} appearance={profile.appearance[character.id]} compact /><span>{character.locale["es-MX"].name}</span></button>)}</aside><section className="preview-card"><div className="sunbeam" /><CharacterArt characterId={selected} appearance={profile.appearance[selected]} /><p>{characterById(selected).locale["es-MX"].description}</p><div className="look-slots">{availableSlots.map((slot) => <span key={slot}>{slotNames[slot]}</span>)}</div></section><section className="closet" aria-label="Ropita y accesorios"><div className="closet-heading"><div><p>EL CLÓSET DE</p><h2>{characterById(selected).locale["es-MX"].name.toUpperCase()}</h2></div><button onClick={surprise}>✦ Sorpresa</button></div><div className="item-grid">{selectedItems.map((item) => { const equipped = profile.appearance[selected][item.slot] === item.id; return <button key={item.id} className={`item-card ${equipped ? "equipped" : ""}`} onClick={() => equip(item.id)} aria-pressed={equipped}><img src={item.asset.thumbnailPath} alt="" onError={(event) => { event.currentTarget.hidden = true; }} /><span>{item.locale["es-MX"].name}</span><small>{slotNames[item.slot]}</small></button>; })}</div><div className="closet-footer"><button onClick={resetLook}>↺ Reiniciar</button><span>{hydrated ? "Guardado en este dispositivo" : "Preparando tu baúl…"}</span></div></section></div></section>}
+    </section>
+    <aside className="message-card" aria-live="polite"><span>✦</span><p>{notice}</p></aside>
+    {activeCameo && <aside className="cameo-card" aria-label={cameos.find((cameo) => cameo.id === activeCameo)?.asset.alt}><img src={cameos.find((cameo) => cameo.id === activeCameo)?.asset.runtimePath} alt="" /><p>{cameos.find((cameo) => cameo.id === activeCameo)?.locale["es-MX"].name}</p></aside>}
+    <nav className="quick-actions" aria-label="Acciones principales"><button onClick={() => setScreen("ranch")}>🏡 <span>Rancho</span></button><button onClick={() => openDress("essma")}>👗 <span>Vestir</span></button><button onClick={(event) => openDialog("collection", event.currentTarget)}>🎒 <span>Colección ({profile.unlocks.itemIds.length}/{wearables.length})</span></button><button onClick={toggleMusic}>🎵 <span>Escuchar música</span></button></nav>
+    {dialog && <div className="modal-backdrop" role="presentation" onMouseDown={closeDialog}><section className="settings-card" role="dialog" aria-modal="true" aria-label={dialog === "collection" ? "Colección" : dialog === "adult" ? "Opciones para adultos" : "Ajustes"} onMouseDown={(event) => event.stopPropagation()}>
+      {dialog === "settings" && <><div className="settings-heading"><div><p>RANCHO DE ESSMA</p><h2>Ajustes</h2></div><button onClick={closeDialog} aria-label="Cerrar ajustes">×</button></div><label><span>🎵 Música</span><input type="checkbox" checked={profile.settings.music} onChange={() => toggleSetting("music")} /></label><label><span>🔔 Sonidos</span><input type="checkbox" checked={profile.settings.sfx} onChange={() => toggleSetting("sfx")} /></label><label><span>🌙 Movimiento suave</span><input type="checkbox" checked={profile.settings.reducedMotion} onChange={() => toggleSetting("reducedMotion")} /></label><div className="backup-box"><p><b>Opciones para adultos</b><br />Los respaldos pueden reemplazar los estilos guardados en este dispositivo.</p><button className="adult-entry" onPointerDown={startAdultHold} onKeyDown={(event) => { if (event.key === " ") startAdultHold(); }} onKeyUp={() => setHoldProgress(0)} style={{ "--hold": holdProgress } as CSSProperties}>Mantén presionado 2 segundos</button></div></>}
+      {dialog === "adult" && <><div className="settings-heading"><div><p>SOLO PARA PERSONAS ADULTAS</p><h2>Respaldos</h2></div><button onClick={closeDialog} aria-label="Cerrar">×</button></div><p>Un respaldo guarda los looks y ajustes en un archivo. Abrir uno no envía información a ningún lugar, pero puede reemplazar el estilo de este dispositivo.</p><div className="adult-actions"><button onClick={exportBackup}>⇩ Guardar respaldo</button><button onClick={() => inputRef.current?.click()}>⇧ Abrir respaldo</button></div><input ref={inputRef} type="file" accept="application/json" onChange={importBackup} hidden /></>}
+      {dialog === "confirm-import" && <><h2>¿Reemplazar el estilo guardado?</h2><p>Revisamos el archivo antes de abrir esta pregunta. Si continúas, los looks y ajustes actuales de este dispositivo serán reemplazados.</p><div className="adult-actions"><button onClick={replaceWithBackup}>Sí, reemplazar</button><button onClick={closeDialog}>No, conservar lo actual</button></div></>}
+      {dialog === "collection" && <><div className="settings-heading"><div><p>TESOROS DEL RANCHO</p><h2>Colección</h2></div><button onClick={closeDialog} aria-label="Cerrar colección">×</button></div><p>{profile.unlocks.itemIds.length} de {wearables.length} prendas iniciales disponibles.</p><ul className="collection-list">{wearables.map((item) => <li key={item.id}>{profile.unlocks.itemIds.includes(item.id) ? "✓" : "○"} {item.locale["es-MX"].name}</li>)}</ul></>}
+    </section></div>}
+  </main>;
 }

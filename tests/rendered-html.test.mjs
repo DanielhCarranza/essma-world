@@ -41,19 +41,22 @@ test("server-renders Essma World", async () => {
 });
 
 test("replaces the disposable starter preview", async () => {
-  const [page, layout, css, packageJson] = await Promise.all([
+  const [page, profileStore, layout, css, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/lib/profile-store.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
-  assert.match(page, /indexedDB/);
+  assert.match(profileStore, /indexedDB/);
   assert.match(page, /Rancho de Essma/);
-  assert.match(page, /Guardar respaldo/);
+  assert.match(page, /Mantén presionado 2 segundos/);
+  assert.match(page, /MiniGame|Colección|Opciones para adultos/);
   assert.match(layout, /Essma World/);
   assert.match(css, /rancho-de-essma-v1\.png/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
+  assert.doesNotMatch(packageJson, /three/);
 
   await assert.rejects(
     access(new URL("../app\/_sites-preview", import.meta.url)),

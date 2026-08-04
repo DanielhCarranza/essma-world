@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import RanchScene, { RanchEvent } from "./ranch-scene";
 
 type CharacterId = "essma" | "juancito" | "tori" | "anita";
 type Slot = "hair" | "outfit" | "shoes" | "accessory" | "head" | "neck" | "body";
@@ -143,6 +144,20 @@ export default function Home() {
     setNotice(`¡Vamos a vestir a ${characters[character].name}!`);
   }
 
+  function handleRanchEvent(event: RanchEvent) {
+    if (event.type === "choose-character") {
+      openDress(event.character);
+      return;
+    }
+
+    const messages = {
+      map: "En el granero hay un mapa antiguo. ¡Algún día nos llevará a una aventura!",
+      flowers: "¡Mira las flores del desierto!",
+      cameo: "¡Muy pronto conocerás a Loro Loco!",
+    };
+    setNotice(messages[event.story]);
+  }
+
   function equip(item: Wearable) {
     setProfile((current) => ({ ...current, appearance: { ...current.appearance, [item.target]: { ...current.appearance[item.target], [item.slot]: item.id } } }));
     setNotice(`¡Listo! A ${characters[item.target].name} le encanta su ${item.name.toLowerCase()}.`);
@@ -202,13 +217,7 @@ export default function Home() {
 
       <section className={`play-area ${screen === "dress" ? "is-dressing" : ""}`}>
         <div className="ranch-stage" aria-hidden={screen === "dress"}>
-          <div className="ranch-title"><span>UN DÍA BONITO EN EL</span><strong>Rancho de Essma</strong></div>
-          <button className="story-spot spot-map" onClick={() => setNotice("En el granero hay un mapa antiguo. ¡Algún día nos llevará a una aventura!")}>✦ <span>El mapa</span></button>
-          <button className="story-spot spot-cactus" onClick={() => setNotice("¡Mira las flores del desierto!")}>🌸 <span>Flores</span></button>
-          <button className="story-spot spot-cameo" onClick={() => setNotice("¡Muy pronto conocerás a Loro Loco!")}>🦜 <span>Muy pronto</span></button>
-          <div className="friend-trail" aria-label="Elige a un amigo para vestir">
-            {(Object.keys(characters) as CharacterId[]).map((id) => <button key={id} className={`ranch-friend ${id === selected ? "is-selected" : ""}`} onClick={() => openDress(id)}><CharacterDoll character={id} appearance={profile.appearance[id]} compact /><span><b>{characters[id].name}</b><small>Vestir</small></span></button>)}
-          </div>
+          <RanchScene selectedCharacter={selected} reducedMotion={profile.settings.reducedMotion} onEvent={handleRanchEvent} />
         </div>
 
         {screen === "dress" && <section className="dress-room" aria-label="Vestir">

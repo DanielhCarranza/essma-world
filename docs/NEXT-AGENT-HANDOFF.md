@@ -17,7 +17,7 @@ Read the production package and visual references first:
 - The initial user experience exists in `app/page.tsx`: ranch home, four dress-up targets, ten starter catalog entries, Mexican-Spanish UI, IndexedDB profile save, and parent backup export/import.
 - `public/assets/rancho-de-essma-v1.png` is an original ranch background. Visual QA: **92/100, passed**. It may ship as launch key art, but later production needs the documented parallax layers and catalog/provenance metadata.
 - The current dress-up people/animals are intentionally code-native placeholder dolls. They prove interaction, layering slots, and persistence; replace them with approved original runtime art before release.
-- `phaser` is declared as the planned 2D runtime dependency. The current ranch scene is a React prototype, not yet a Phaser scene. Keep React for accessible menus and inventory panels; move the ranch world and hotspot handling to Phaser once the build is healthy.
+- The ranch world and its touch/mouse hotspots run in `app/ranch-scene.tsx` through Phaser, using the approved ranch asset as the initial backdrop. React retains the accessible menus, inventory panels, persistence, and semantic fallback controls; the scene communicates selections through a small typed event interface.
 - Future Three.js work is isolated to future mini-games. Do **not** add Three.js to the ranch core.
 
 ## First task: recover a healthy native build
@@ -32,11 +32,10 @@ The prior environment used a WSL shell over a Windows-mounted workspace. Its `np
 
 ## Next implementation slice
 
-After validation, deliver the following in a focused change:
+After validation, continue from the focused Phaser ranch change:
 
-- Implement the ranch as a Phaser 2D scene using the approved ranch asset as the initial backdrop.
-- Keep the React dress-up panel, accessibility, Spanish strings, IndexedDB schema, and parent backup contract intact.
-- Route ranch hotspot/character selection through a small typed scene-to-React event interface.
+- Keep the React dress-up panel, accessibility, Spanish strings, IndexedDB schema, and parent backup contract intact while advancing the scene.
+- Preserve the typed scene-to-React event interface for ranch hotspot and character selection.
 - Generate or commission original character bases for Essma, Juancito, Tori, and Anita, plus the ten cataloged wearable layers. Submit each production asset to visual QA before use.
 - Add only the asset metadata needed for the playable core: stable ID, target, slot, source/prompt/provenance, thumbnail, runtime file, and `es-MX` display name.
 

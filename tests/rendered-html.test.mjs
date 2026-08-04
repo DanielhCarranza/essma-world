@@ -48,7 +48,7 @@ test("replaces the disposable starter preview", async () => {
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
-  assert.match(page, /IndexedDB/);
+  assert.match(page, /indexedDB/);
   assert.match(page, /Rancho de Essma/);
   assert.match(page, /Guardar respaldo/);
   assert.match(layout, /Essma World/);

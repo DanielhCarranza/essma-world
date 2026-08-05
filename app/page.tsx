@@ -25,6 +25,8 @@ import { readSavedProfile, writeSavedProfile } from "./lib/profile-store";
 import WorldMap from "./world-map";
 import DressUpPanel from "./dress-up-panel";
 import RanchDecorator, { RanchDecoratorIntent } from "./ranch-decorator";
+import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
+import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
 
 type Screen = "map" | "ranch" | "dress";
 type Dialog = "settings" | "collection" | "adult" | "confirm-import" | null;
@@ -91,6 +93,7 @@ export default function Home() {
   const [decorating, setDecorating] = useState(false);
   const [selectedDecorId, setSelectedDecorId] = useState<string | null>(null);
   const [decorHistory, setDecorHistory] = useState<RanchLayout[]>([]);
+  const [showGardenActivity, setShowGardenActivity] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [holdProgress, setHoldProgress] = useState(0);
   const [pendingImport, setPendingImport] = useState<PlayerProfile | null>(
@@ -101,6 +104,53 @@ export default function Home() {
   const dialogRef = useRef<HTMLElement>(null);
   const adultHoldFrameRef = useRef<number | null>(null);
   const { play, startMusic } = useSound(profile.settings);
+
+  async function handleGardenFinish(result: MiniGameResult) {
+    setShowGardenActivity(false);
+    if (result.status !== "completed") return;
+
+    const miniGamePlayer = {
+      profileId: profile.profileId,
+      unlockedIds: [...profile.unlocks.itemIds, ...profile.unlocks.decorIds],
+    };
+    const policy = {
+      allowedUnlockIds: new Set<string>(GARDEN_REWARD_IDS),
+    };
+    const applyRes = await applyMiniGameResult(
+      miniGamePlayer,
+      result,
+      policy,
+      {
+        save: async (nextPlayer) => {
+          updateProfile((current) => {
+            const newItemIds = nextPlayer.unlockedIds.filter((id) =>
+              getWearable(id),
+            );
+            const newDecorIds = nextPlayer.unlockedIds.filter((id) =>
+              ranchDecor.some((d) => d.id === id),
+            );
+            return {
+              ...current,
+              unlocks: {
+                ...current.unlocks,
+                itemIds: Array.from(
+                  new Set([...current.unlocks.itemIds, ...newItemIds]),
+                ),
+                decorIds: Array.from(
+                  new Set([...current.unlocks.decorIds, ...newDecorIds]),
+                ),
+              },
+            };
+          });
+        },
+      },
+    );
+
+    if (applyRes.status === "saved" && applyRes.awardedIds.length > 0) {
+      setNotice("¡Nuevo regalo desbloqueado en tu colección!");
+      play("confirm");
+    }
+  }
 
   useEffect(() => {
     readSavedProfile()
@@ -437,14 +487,40 @@ export default function Home() {
                   />
                 )}
                 {!decorating && (
-                  <button
-                    className="decorate-launch"
-                    type="button"
-                    onClick={openDecorator}
-                  >
-                    <span aria-hidden="true">🌼</span>
-                    <b>Decorar</b>
-                  </button>
+                  <div className="ranch-action-bar">
+                    <button
+                      className="decorate-launch"
+                      type="button"
+                      onClick={openDecorator}
+                    >
+                      <span aria-hidden="true">🌼</span>
+                      <b>Decorar</b>
+                    </button>
+                    <button
+                      className="decorate-launch garden-launch"
+                      type="button"
+                      onClick={() => setShowGardenActivity(true)}
+                    >
+                      <span aria-hidden="true">🌱</span>
+                      <b>Jardín</b>
+                    </button>
+                  </div>
+                )}
+                {showGardenActivity && (
+                  <GardenActivity
+                    context={{
+                      player: {
+                        profileId: profile.profileId,
+                        unlockedIds: [
+                          ...profile.unlocks.itemIds,
+                          ...profile.unlocks.decorIds,
+                        ],
+                      },
+                      settings: profile.settings,
+                      locale: "es-MX",
+                    }}
+                    onFinish={handleGardenFinish}
+                  />
                 )}
               </div>
             )}

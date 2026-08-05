@@ -1225,3 +1225,135 @@ button:focus-visible {
     font-size: 14px;
   }
 }
+
+/* Garden Activity & Action Bar */
+.ranch-action-bar {
+  position: absolute;
+  right: 18px;
+  bottom: 154px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.garden-launch {
+  background: #3e7b39;
+  border-color: #274f24;
+}
+.garden-activity-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(30, 20, 15, 0.65);
+}
+.garden-card {
+  width: min(520px, 94vw);
+  background: #fff8e7;
+  border: 4px solid #4a6834;
+  box-shadow: 0 8px 0 #2e441f;
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.garden-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.garden-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+}
+.garden-title h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #2e441f;
+}
+.garden-close-button {
+  border: 0;
+  background: #d75b45;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+}
+.garden-instruction {
+  margin: 0;
+  font-weight: 800;
+  font-size: 15px;
+  color: #4a6834;
+  text-align: center;
+}
+.garden-tools {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.tool-chip {
+  border: 3px solid #75412b;
+  background: #fff0c9;
+  border-radius: 16px;
+  padding: 8px 18px;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+}
+.tool-chip.is-selected {
+  background: #54823f;
+  color: #fff;
+  border-color: #2e441f;
+}
+.garden-bed {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px;
+  background: #7a5438;
+  border-radius: 18px;
+  border: 3px solid #573a25;
+}
+.garden-spot {
+  background: #4a3424;
+  border: 3px solid #634732;
+  border-radius: 16px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-height: 100px;
+}
+.garden-spot:hover,
+.garden-spot:focus-visible {
+  border-color: #f0b635;
+  background: #5a412e;
+}
+.spot-icon {
+  font-size: 38px;
+}
+.spot-label {
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff8e7;
+}
+.claim-reward-button {
+  width: 100%;
+  padding: 14px;
+  background: #e59029;
+  color: #fff;
+  border: 3px solid #9e5b0e;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 900;
+  cursor: pointer;
+}

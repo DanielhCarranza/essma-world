@@ -63,7 +63,7 @@ export type WearableDefinition = {
   anchor: { x: number; y: number };
   zIndex: number;
   locale: LocalizedText;
-  unlock: { type: "starter" };
+  unlock: { type: "starter" } | { type: "reward"; activityId: string };
   asset: CatalogAsset;
 };
 
@@ -112,7 +112,7 @@ export type RanchDecorDefinition = {
   version: number;
   kind: "ranch-decor";
   locale: LocalizedText;
-  unlock: { type: "starter" };
+  unlock: { type: "starter" } | { type: "reward"; activityId: string };
   compatibleZoneIds: readonly RanchPlacementZoneId[];
   asset: CatalogAsset;
 };
@@ -188,7 +188,7 @@ export const characters: readonly CharacterDefinition[] = [
       "/assets/characters/v1/essma-base.png",
       "/assets/characters/v1/thumbnails/essma-base.png",
       "Essma, exploradora del rancho",
-      { ...qa, score: 82 },
+      { ...qa, status: "approved", score: 88 },
     ),
   },
   {
@@ -262,6 +262,7 @@ function wearable(
   zIndex: number,
   score: number,
   assetVersion: 1 | 2 = 1,
+  unlock: WearableDefinition["unlock"] = { type: "starter" },
 ): WearableDefinition {
   const character = characters.find((entry) => entry.id === target);
   const anchor = character?.anchors[slot];
@@ -276,7 +277,7 @@ function wearable(
     anchor,
     zIndex,
     locale: { "es-MX": { name, description } },
-    unlock: { type: "starter" },
+    unlock,
     asset: originalAsset(
       `/assets/wearables/v${assetVersion}/${slug}.png`,
       `/assets/wearables/v${assetVersion}/thumbnails/${slug}.png`,
@@ -476,6 +477,17 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     92,
     2,
+  ),
+  wearable(
+    "wearable.essma.sombrero-jardinero",
+    "essma",
+    "hair",
+    "Sombrero jardinero",
+    "Sombrero para cuidar el jardín.",
+    60,
+    91,
+    2,
+    { type: "reward", activityId: "cuida-el-jardin" },
   ),
 ] as const;
 
@@ -695,6 +707,7 @@ function defineRanchDecor(
   description: string,
   compatibleZoneIds: readonly RanchPlacementZoneId[],
   score: number,
+  unlock: RanchDecorDefinition["unlock"] = { type: "starter" },
 ): RanchDecorDefinition {
   const slug = id.replace("decor.rancho.", "");
   return {
@@ -702,7 +715,7 @@ function defineRanchDecor(
     version: 1,
     kind: "ranch-decor",
     locale: { "es-MX": { name, description } },
-    unlock: { type: "starter" },
+    unlock,
     compatibleZoneIds,
     asset: originalAsset(
       `/assets/decor/v1/${slug}.png`,
@@ -786,6 +799,14 @@ export const ranchDecor: readonly RanchDecorDefinition[] = [
     ["patio.mesquite", "patio.corral", "patio.fogata"],
     92,
   ),
+  defineRanchDecor(
+    "decor.rancho.maceta-girasol",
+    "Maceta de girasoles",
+    "Maceta del jardín con girasoles sonrientes.",
+    ["patio.puerta", "patio.macetas", "patio.flores"],
+    92,
+    { type: "reward", activityId: "cuida-el-jardin" },
+  ),
 ] as const;
 
 export const cameos: readonly CameoDefinition[] = [
@@ -842,8 +863,12 @@ export const cameos: readonly CameoDefinition[] = [
   },
 ] as const;
 
-export const starterWearableIds = wearables.map((item) => item.id);
-export const starterRanchDecorIds = ranchDecor.map((item) => item.id);
+export const starterWearableIds = wearables
+  .filter((item) => item.unlock.type === "starter")
+  .map((item) => item.id);
+export const starterRanchDecorIds = ranchDecor
+  .filter((item) => item.unlock.type === "starter")
+  .map((item) => item.id);
 export const starterRegionIds: readonly WorldRegionId[] = ["region.rancho"];
 
 /**

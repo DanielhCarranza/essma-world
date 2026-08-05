@@ -70,3 +70,24 @@ test("cancelled and failed mini-games never save or mutate the profile", async (
   assert.equal(saves.length, 0);
   assert.deepEqual(player.unlockedIds, ["wearable.essma.vestido-girasol"]);
 });
+
+test("garden activity reward policy unlocks allowlisted catalog items", async () => {
+  const { GARDEN_REWARD_IDS } = await import("../app/garden-activity.tsx");
+  const gardenPolicy: MiniGameRewardPolicy = {
+    allowedUnlockIds: new Set(GARDEN_REWARD_IDS),
+  };
+  const { adapter, saves } = persistence();
+  const outcome = await applyMiniGameResult(
+    player,
+    {
+      status: "completed",
+      rewards: [{ type: "unlock", catalogId: "decor.rancho.maceta-girasol" }],
+    },
+    gardenPolicy,
+    adapter,
+  );
+
+  assert.equal(outcome.status, "saved");
+  assert.deepEqual(outcome.awardedIds, ["decor.rancho.maceta-girasol"]);
+  assert.equal(saves.length, 1);
+});

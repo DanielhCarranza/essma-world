@@ -39,9 +39,9 @@ const { randomizeAppearance, resetAppearance, resolveAppearance } =
   appearanceLib;
 const NOW = "2026-08-03T12:00:00.000Z";
 
-test("catalog contains four anchored bases and twenty compatible starter wearables", () => {
+test("catalog contains four anchored bases and compatible wearables", () => {
   assert.equal(characters.length, 4);
-  assert.equal(wearables.length, 20);
+  assert.ok(wearables.length >= 20);
   assert.deepEqual(
     Object.fromEntries(
       CHARACTER_IDS.map((id) => [
@@ -50,7 +50,7 @@ test("catalog contains four anchored bases and twenty compatible starter wearabl
       ]),
     ),
     {
-      essma: 8,
+      essma: 9,
       juancito: 4,
       tori: 4,
       anita: 4,
@@ -104,10 +104,10 @@ test("catalog defines an open Rancho, five locked regions, and reviewed decor pl
     5,
   );
   assert.equal(ranchPlacementZones.length, 6);
-  assert.equal(ranchDecor.length, 10);
+  assert.ok(ranchDecor.length >= 10);
   assert.deepEqual(
     starterRanchDecorIds,
-    ranchDecor.map((decor) => decor.id),
+    ranchDecor.filter((item) => item.unlock.type === "starter").map((decor) => decor.id),
   );
   for (const decor of ranchDecor) {
     assert.match(decor.asset.runtimePath, /^\/assets\/decor\/v1\//);

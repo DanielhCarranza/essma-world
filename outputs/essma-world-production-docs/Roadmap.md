@@ -10,15 +10,15 @@ The roadmap prioritizes a delightful, safe first play session over broad but sha
 
 ## 1. Playable Core
 
-**Deliverables:** Mexican-Spanish home/menu; 2D ranch scene; Essma, Juancito, Tori, and Anita dress-up; ten starter items; settings; IndexedDB save; parent export/import; touch and desktop support.
+**Deliverables:** Mexican-Spanish illustrated map; persistent Phaser ranch; Essma, Juancito, Tori, and Anita dress-up; twenty starter wearables; ten patio decorations; settings; IndexedDB save; guarded caregiver export/import; touch, mouse, and keyboard support.
 
 **Dependencies:** base-character layers, UI kit, save schema, scene-loading strategy, and child playtest script.
 
-**Exit gate:** a child can independently create a look, save it, reopen the game, and see it in the ranch. No account, payment, ad, chat, or external-link path exists.
+**Exit gate:** a child can independently enter the ranch, create a look, place a patio object, reopen the game, and see both choices. No account, payment, ad, chat, analytics, or external-link path exists.
 
 ## 2. Cozy Ranch Expansion
 
-**Deliverables:** small décor set and safe placement tools; animal care; clear quest journal; collection/unlock flow; photo mode; one optional mini-game with a declared learning intent.
+**Deliverables:** animal care; one short visual quest; expanded collection/unlock feedback; photo mode; and one optional mini-game with a declared learning intent.
 
 **Dependencies:** layout schema migration, furniture catalog, undo/reset controls, reward validation, and cultural/content review.
 
@@ -26,7 +26,7 @@ The roadmap prioritizes a delightful, safe first play session over broad but sha
 
 ## 3. World Expansion
 
-**Deliverables:** illustrated map; first additional regions (desert, pueblo, oasis); collectibles; story quests; shops without real-money purchasing; festival framework; approved new NPCs/companions.
+**Deliverables:** turn one of the five locked map places into a playable second region, then add desert/pueblo/oasis stories, collectibles, shops without real-money purchasing, a festival framework, and reviewed new NPCs/companions.
 
 **Dependencies:** region content budgets, travel/loading design, localization review, and performance testing on target devices.
 

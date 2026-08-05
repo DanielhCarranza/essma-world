@@ -1,0 +1,37 @@
+{
+  "id": "scene.sonora-world-map",
+  "version": 2,
+  "kind": "scene",
+  "locale": {
+    "es-MX": {
+      "name": "Mapa de Essma World",
+      "description": "Mapa ilustrado del Rancho de Essma y sus futuras regiones."
+    }
+  },
+  "owner": "world-map-v2",
+  "source": {
+    "method": "OpenAI built-in image generation",
+    "referencePolicy": "The five repository reference images informed only broad, non-copied art direction: warm Sonoran golden light, adobe and wood materials, child-friendly landscape readability. They are not embedded, derived from, or shipped as runtime media.",
+    "generatedAt": "2026-08-04",
+    "prompts": {
+      "landscape": "Use case: illustration-story. Asset type: responsive web-game world map backdrop (landscape 16:9), project-bound raster art. Primary request: create an entirely original, richly painted but clear children's storybook map of a warm Sonoran ranch region at late-afternoon golden light. This is background art only, with NO labels, NO lettering, NO logos, NO UI, NO watermark. Scene/backdrop: a wide aerial three-quarter view with six clearly separated landmark spaces joined by a gently winding dusty trail: center-lower ranch home with red adobe house, small barn, corral and green mesquite trees; upper-left cactus desert with rock mesas; upper-right a compact colorful pueblo of adobe buildings; lower-right dense mesquite grove; far-right small blue oasis with palms; lower-left valley filled with wildflowers. Leave breathing room and uncluttered open ground around each landmark so web hotspots can be overlaid. Subject: landscape only; no characters, people, animals, signs, maps, icons, or text. Style/medium: original hand-painted children’s-book environment illustration, tactile adobe, sun-baked clay, wood, woven textures and soft paper grain; rounded friendly forms with precise readable silhouettes. Composition/framing: wide 16:9 composition, ranch as prominent center destination; distribute landmark clusters near edges; keep all essential landmarks away from outer 6% crop safe margin so a mobile crop still reads. Lighting/mood: optimistic golden Sonoran afternoon; dappled, cozy and inviting. Color palette: sand beige, terracotta, marigold, cactus and mesquite green, cobalt water, desert-pink sky. Constraints: design must be original, culturally respectful, child-friendly, visually legible at small sizes; no text whatsoever; no third-party characters, logos, copied layouts, or named-studio imitation. Avoid: UI panels, buttons, text, border frame, watermark, labels, title, compass, topographic overlay, realistic photo look, scary elements.",
+      "portrait": "Use case: illustration-story. Asset type: responsive web-game world map backdrop (portrait 9:16), project-bound raster art. Primary request: create an entirely original, richly painted but clear children's storybook map of a warm Sonoran ranch region at late-afternoon golden light. This is background art only, with NO labels, NO lettering, NO logos, NO UI, NO watermark. Scene/backdrop: a tall aerial three-quarter illustrated map in a vertically flowing composition with six clearly separated landmark spaces connected by a gently winding dusty trail: ranch home with red adobe house, small barn, corral and green mesquite trees prominently in the middle; cactus desert with rock mesas toward the top-left; compact colorful pueblo of adobe buildings top-right; dense mesquite grove lower-right; small cobalt-blue oasis with palms mid-right; valley filled with wildflowers lower-left. Each landmark must have uncluttered local ground around it for an HTML hotspot overlay. Subject: landscape only; no characters, people, animals, signs, maps, icons, or text. Style/medium: original hand-painted children’s-book environment illustration, tactile adobe, sun-baked clay, wood, woven textures and soft paper grain; rounded friendly forms with precise readable silhouettes. Composition/framing: tall 9:16 composition, essential landmarks all inside the central 90% crop safe margins, ranch large and obvious in the central middle. Leave a soft open sky strip at top for a page title overlay. Lighting/mood: optimistic golden Sonoran afternoon; dappled, cozy and inviting. Color palette: sand beige, terracotta, marigold, cactus and mesquite green, cobalt water, desert-pink sky. Constraints: design must be original, culturally respectful, child-friendly, visually legible at small sizes; no text whatsoever; no third-party characters, logos, copied layouts, or named-studio imitation. Avoid: UI panels, buttons, text, border frame, watermark, labels, title, compass, topographic overlay, realistic photo look, scary elements."
+    }
+  },
+  "runtime": [
+    {
+      "file": "sonora-world-map-landscape-v2.png",
+      "targetResolution": "1672x941",
+      "usage": "Desktop and landscape map backdrop"
+    },
+    {
+      "file": "sonora-world-map-portrait-v2.png",
+      "targetResolution": "941x1672",
+      "usage": "Portrait-mobile map backdrop"
+    }
+  ],
+  "accessibilityReview": {
+    "status": "passed",
+    "notes": "Landmarks are not the only means of identification: semantic labelled HTML hotspots and status feedback sit above the decorative backdrop. No generated text is embedded in either image."
+  }
+}

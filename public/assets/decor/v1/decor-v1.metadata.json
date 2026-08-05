@@ -1,0 +1,27 @@
+{
+  "packId": "essma-world-ranch-decor-v1",
+  "version": 1,
+  "generator": "OpenAI built-in image generation",
+  "referencePolicy": "Repository ranch references informed only the warm Sonoran palette, material language, and child-friendly mood. No reference image is shipped or used at runtime.",
+  "commonPrompt": "Create one original, friendly 2D storybook ranch-patio prop for Essma World. Warm Sonoran afternoon light, tactile adobe-ranch materials, strong readable silhouette, three-quarter view matching the supplied production ranch background. Isolated on a solid chroma-key background. No characters, logos, branding, letters, ratings, copied composition, or imitation of a named studio.",
+  "postProcess": "Chroma-key removal, transparent-edge inspection, placement on a 768px transparent runtime canvas, then derived 256px thumbnail.",
+  "items": [
+    { "id": "decor.mesa-picnic", "file": "mesa-picnic.png" },
+    { "id": "decor.sillas-coloridas", "file": "sillas-coloridas.png" },
+    { "id": "decor.macetas-talavera", "file": "macetas-talavera.png" },
+    { "id": "decor.tapete-tejido", "file": "tapete-tejido.png" },
+    { "id": "decor.fogata-amigable", "file": "fogata-amigable.png" },
+    { "id": "decor.bebedero-pajaros", "file": "bebedero-pajaros.png" },
+    { "id": "decor.cajon-cosecha", "file": "cajon-cosecha.png" },
+    { "id": "decor.farol-papel", "file": "farol-papel.png" },
+    { "id": "decor.molinillo-viento", "file": "molinillo-viento.png" },
+    { "id": "decor.banca-mesquite", "file": "banca-mesquite.png" }
+  ],
+  "qa": {
+    "alphaChecked": true,
+    "silhouetteChecked": true,
+    "productApproved": false,
+    "culturalReview": "not-performed",
+    "note": "Release-candidate art pending final in-game product review and any external cultural review."
+  }
+}

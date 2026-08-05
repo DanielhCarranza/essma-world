@@ -27,10 +27,12 @@ export async function readSavedProfile(): Promise<PlayerProfile | null> {
 }
 
 export async function writeSavedProfile(profile: PlayerProfile): Promise<void> {
+  const result = validateAndMigrateProfile(profile);
+  if (!result.ok) throw new Error(`Refusing to save an invalid profile: ${result.reason}`);
   const db = await openProfileDb();
   await new Promise<void>((resolve, reject) => {
     const transaction = db.transaction(STORE_NAME, "readwrite");
-    transaction.objectStore(STORE_NAME).put(profile, LOCAL_PROFILE_ID);
+    transaction.objectStore(STORE_NAME).put(result.profile, LOCAL_PROFILE_ID);
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(transaction.error);
   });

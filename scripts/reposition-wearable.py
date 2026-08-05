@@ -12,7 +12,7 @@ from pathlib import Path
 
 from PIL import Image
 
-CANVAS = 1254
+DEFAULT_CANVAS = 1254
 
 
 def main() -> None:
@@ -23,6 +23,7 @@ def main() -> None:
     parser.add_argument("--top", type=int, required=True)
     parser.add_argument("--max-width", type=int, required=True)
     parser.add_argument("--max-height", type=int, required=True)
+    parser.add_argument("--canvas", type=int, default=DEFAULT_CANVAS)
     args = parser.parse_args()
 
     source = Image.open(args.input).convert("RGBA")
@@ -34,7 +35,7 @@ def main() -> None:
     scale = min(args.max_width / item.width, args.max_height / item.height)
     size = (max(1, round(item.width * scale)), max(1, round(item.height * scale)))
     item = item.resize(size, Image.Resampling.LANCZOS)
-    layer = Image.new("RGBA", (CANVAS, CANVAS))
+    layer = Image.new("RGBA", (args.canvas, args.canvas))
     left = round(args.center_x - item.width / 2)
     layer.alpha_composite(item, (left, args.top))
     args.output.parent.mkdir(parents=True, exist_ok=True)

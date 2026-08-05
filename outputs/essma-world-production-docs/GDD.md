@@ -2,13 +2,13 @@
 
 ## Player experience
 
-The player begins at **Rancho de Essma**. The first session is a guided invitation: choose Essma or a friend, pick a hat, outfit, accessory, or shoes, and watch the ranch scene become theirs. There is no score, currency, or wrong combination.
+The player begins on the **Essma World map**. Rancho is the one bright open destination; five future regions are visibly locked. Inside the ranch, the player can choose a friend, dress them, decorate the patio, and see both choices saved. There is no score, currency, or wrong combination.
 
 ### First-session flow
 
 ```text
-Inicio → “¡Hola, Essma!” → Rancho → Vestir → Elegir personaje
-       → Elegir artículo → Vista previa → “¡Listo!” → Rancho
+Mapa → Rancho → Elegir amigo → Vestir → Elegir artículo → “¡Listo!”
+     → Decorar → Elegir objeto → Elegir lugar → “Listo” → Rancho
 ```
 
 On return, each equipped character uses their saved appearance. The menu offers a large play button, a dress-up shortcut, settings, and a discreet parent entry point.
@@ -26,7 +26,7 @@ Each item has an ID, thumbnail, full-size visual layers, allowed targets, layer 
 
 ### Starter catalog target
 
-At least ten total items are available at launch: a mix of Essma clothing/accessories plus compatible companion hats, bandanas, or body items. Exact visual choices are selected from the approved asset manifest, not invented in code.
+Twenty total wearables are available in the playable core: eight for Essma and four for each companion. Ten patio objects are also available through a validated decoration catalog. Exact visual choices come from versioned asset manifests, not ad hoc scene code.
 
 ## Ranch hub
 
@@ -40,7 +40,7 @@ Future unlock rules are transparent: a player sees what activity opens an item a
 
 ## Future systems
 
-- **Decoration:** snap-safe placement, move, rotate, undo, and reset; no irreversible layouts.
+- **Decoration expansion:** more snap-safe zones and themed sets; the core already supports place, remove, undo, and reset with no irreversible layouts.
 - **Animal care:** short feed/brush/bathe interactions with visible kindness, not neglect penalties.
 - **Quests:** one clear goal, progress indicator, and cosmetic/story reward.
 - **Mini-games:** short, optional, and declared as fun, nature/culture discovery, early math, or Spanish-literacy activities before production begins.

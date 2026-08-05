@@ -4,8 +4,6 @@ import test from "node:test";
 
 const developmentPreviewMeta =
   /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
-const templateRoot = new URL("../", import.meta.url);
-
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
@@ -35,16 +33,24 @@ test("server-renders Essma World", async () => {
   const html = await response.text();
   assert.doesNotMatch(html, developmentPreviewMeta);
   assert.match(html, /<title>Essma World \| Rancho de Essma<\/title>/i);
-  assert.match(html, /ESSMA/);
-  assert.match(html, /WORLD/);
+  assert.match(html, /Essma World/i);
   assert.doesNotMatch(html, /react-loading-skeleton/);
 });
 
 test("replaces the disposable starter preview", async () => {
-  const [page, worldMap, ranchScene, profileStore, layout, packageJson] = await Promise.all([
+  const [
+    page,
+    worldMap,
+    ranchScene,
+    ranchDecorator,
+    profileStore,
+    layout,
+    packageJson,
+  ] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/world-map.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/ranch-scene.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/ranch-decorator.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/lib/profile-store.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
@@ -59,7 +65,10 @@ test("replaces the disposable starter preview", async () => {
   assert.match(worldMap, /Toca el Rancho/);
   assert.match(worldMap, /Próximamente|Pronto/);
   assert.match(page, /Mantén presionado 2 segundos/);
+  assert.match(page, /Decorar/);
   assert.match(page, /MiniGame|Colección|Opciones para adultos/);
+  assert.match(ranchDecorator, /place-decor/);
+  assert.match(ranchDecorator, /undo-decor/);
   assert.match(layout, /Essma World/);
   assert.match(ranchScene, /rancho-de-essma-v1\.png/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);

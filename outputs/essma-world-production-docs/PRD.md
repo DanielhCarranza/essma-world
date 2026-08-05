@@ -48,13 +48,15 @@ NPCs and future companions are flexible until approved through the content pipel
 - Main menu and Mexican-Spanish settings.
 - One Ranch de Essma 2D scene.
 - Dress-up for Essma, Juancito, Tori, and Anita.
-- Ten starter items across supported layers.
+- Twenty starter wearables across supported layers.
+- An illustrated six-region map with Rancho open and five clearly locked future places.
+- Ten snap-safe patio decorations with place, remove, undo, and reset.
 - Immediate preview, equip/unequip, randomize, and reset actions.
 - Local single-player save, audio/reduced-motion controls, and parent backup/restore entry point.
 
 ### Explicitly deferred
 
-- Decoration placement, economy, quests, region map, shop, photo mode, festivals, multiplayer, cloud profiles, payments, ads, and 3D gameplay.
+- Economy, quests, playable additional regions, shop, photo mode, festivals, multiplayer, cloud profiles, payments, ads, and 3D gameplay.
 - Educational objectives in the initial dress-up activity.
 
 ## Future game modes
@@ -63,7 +65,7 @@ NPCs and future companions are flexible until approved through the content pipel
 | --- | --- | --- |
 | Ranch exploration | Visit activity points and story moments. | Playable Core |
 | Dress-up | Customize Essma and eligible companions. | Playable Core |
-| Decoration | Place and rotate unlocked ranch/room items. | Cozy Ranch Expansion |
+| Decoration | Place or remove unlocked patio items in safe authored zones. | Playable Core |
 | Quests and collection | Earn items through kind, short goals. | Cozy Ranch Expansion |
 | Mini-games | Optional short activities; learning intent declared per game. | Cozy Ranch Expansion |
 | Regions and festivals | Explore Sonoran locations and seasonal stories. | World Expansion |

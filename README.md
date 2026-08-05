@@ -2,41 +2,41 @@
 
 **Essma World** is a cozy, Spanish-first 2D web game about Essma de María and her animal friends exploring, creating, and caring for their ranch in Sonora, Mexico.
 
-The game is being built as a child-safe creative world for one player aged 5–10. Its opening experience is pure dress-up fun: choose Essma, Juancito, Tori, or Anita; create a look; and see it at **Rancho de Essma**. Future updates will add ranch decoration, quests, gentle learning mini-games, new regions, and isolated 3D mini-games where they genuinely improve play.
+The game is being built as a child-safe creative world for one player aged 5–10. Its playable loop begins on an illustrated Sonoran map: enter **Rancho de Essma**, dress Essma, Juancito, Tori, or Anita, decorate the patio, and return later to the same saved ranch.
 
 ## What is in this repository
 
-- A first playable-core source experience: ranch home, Spanish dress-up UI, four launch characters, ten starter wearables, local device saving, accessibility preferences, and parent backup/export/import.
+- A playable-core experience: one open ranch on a six-region world map, four launch characters, twenty starter wearables, ten placeable patio decorations, local saving, accessibility preferences, and guarded caregiver backup/import.
 - An original, visually reviewed Sonoran ranch background in `public/assets/`.
 - A complete production package covering product, gameplay, architecture, assets, safety, roadmap, and tests.
 - The full user-supplied visual reference pack, kept privately for art direction.
 
 ## The game promise
 
-- **Creative:** dress Essma and her friends, then later decorate and personalize the ranch.
-- **Sonoran:** build from real landscapes, animals, materials, and traditions with respectful cultural review.
+- **Creative:** dress Essma and her friends, then decorate and personalize the ranch patio.
+- **Sonoran:** build from local landscapes, animals, and material cues while recording review status truthfully; no external cultural review is claimed yet.
 - **Gentle:** no ads, purchases, accounts, chat, scoring pressure, streaks, loot boxes, or child data collection.
 - **Spanish-first:** every child-facing string is Mexican Spanish.
 
 ## Canonical friends
 
-| Character | Role in the playable core |
-| --- | --- |
-| Essma de María | Main character and dress-up lead |
-| Juancito | Interactive, dressable prairie dog |
-| Tori | Interactive, dressable cacomixtle |
-| Anita | Interactive, dressable little cow |
+| Character                        | Role in the playable core                                |
+| -------------------------------- | -------------------------------------------------------- |
+| Essma de María                   | Main character and dress-up lead                         |
+| Juancito                         | Interactive, dressable prairie dog                       |
+| Tori                             | Interactive, dressable cacomixtle                        |
+| Anita                            | Interactive, dressable little cow                        |
 | Loro Loco, Oso Taquito, Capybara | Protected recurring story characters; later interactions |
 
 ## Start here
 
-| Need | Where to go |
-| --- | --- |
-| Continue implementation | [`docs/NEXT-AGENT-HANDOFF.md`](docs/NEXT-AGENT-HANDOFF.md) |
-| Repository rules for agents | [`AGENTS.md`](AGENTS.md) |
-| Product and design documents | [`outputs/essma-world-production-docs/README.md`](outputs/essma-world-production-docs/README.md) |
-| Visual gold-standard reference pack | [`docs/reference-images/README.md`](docs/reference-images/README.md) |
-| Active continuation task | [GitHub Issue #1](https://github.com/DanielhCarranza/essma-world/issues/1) |
+| Need                                | Where to go                                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Continue implementation             | [`docs/NEXT-AGENT-HANDOFF.md`](docs/NEXT-AGENT-HANDOFF.md)                                       |
+| Repository rules for agents         | [`AGENTS.md`](AGENTS.md)                                                                         |
+| Product and design documents        | [`outputs/essma-world-production-docs/README.md`](outputs/essma-world-production-docs/README.md) |
+| Visual gold-standard reference pack | [`docs/reference-images/README.md`](docs/reference-images/README.md)                             |
+| Active continuation task            | [GitHub Issue #1](https://github.com/DanielhCarranza/essma-world/issues/1)                       |
 
 ## Development
 
@@ -50,7 +50,7 @@ npm test
 npm run lint
 ```
 
-The current core uses React for accessible menus, dress-up panels, settings, and local-save flows. The ranch world is planned to move behind a Phaser 2D scene boundary. Three.js is a future option for self-contained mini-games only; it must not be introduced into the ranch core.
+The current core uses React for the world map, accessible menus, dress-up, decorating, settings, and local-save flows. Phaser owns one persistent 2D ranch scene behind a typed event boundary. Three.js remains a future option for isolated mini-games only and is not part of the ranch bundle.
 
 ## Art and references
 
@@ -60,9 +60,9 @@ New production assets must be original, have a stable catalog ID and provenance 
 
 ## Roadmap
 
-1. **Playable Core:** validate the build; finish the 2D ranch and dress-up foundation.
-2. **Cozy Ranch Expansion:** decoration, animal care, quests, collection, photo mode, and one optional mini-game.
-3. **World Expansion:** desert, pueblo, oasis, festivals, collectibles, and new companions.
+1. **Playable Core:** world map, ranch, dress-up, patio decorating, persistence, safety, and accessibility foundation.
+2. **Cozy Ranch Expansion:** animal care, one short quest, collection rewards, photo mode, and one optional mini-game.
+3. **World Expansion:** unlock a second region, then add pueblo/oasis stories, festivals, collectibles, and companions.
 4. **Future modules:** Essma Bros integration, isolated 3D mini-games, seasonal content, and an evaluated parent-controlled cloud-backup option.
 
 The detailed milestones and acceptance gates live in [Roadmap.md](outputs/essma-world-production-docs/Roadmap.md).

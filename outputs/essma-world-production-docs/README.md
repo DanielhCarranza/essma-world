@@ -16,7 +16,7 @@ This package is the source of truth for pre-production of **Essma World**, a Spa
 
 - The child-facing game is entirely in Mexican Spanish; these production documents are in English.
 - Essma de María is the protagonist. Juancito, Tori, Anita, Loro Loco, Oso Taquito, and Capybara are protected recurring characters. New characters may change through the content pipeline.
-- The first playable release is a 2D ranch-and-dress-up vertical slice: one ranch, Essma, Juancito, Tori, Anita, and ten starter wearable/accessory items.
+- The playable core is a 2D map-and-ranch vertical slice: one open ranch, five locked future places, Essma, Juancito, Tori, Anita, twenty starter wearables, and ten patio decorations.
 - Dress-up is creative play, with no learning objective in the opening experience. Learning is added only in later mini-games and quests.
 - The game has one local player, no ads, purchases, accounts, chat, social sharing, or analytics. A parent-only export/import backup is planned.
 - Authored assets are original. Reference images establish mood only; they do not grant permission to copy characters, layouts, logos, or third-party marks.
@@ -34,4 +34,4 @@ This package is the source of truth for pre-production of **Essma World**, a Spa
 
 ## Source and reference policy
 
-The supplied PRD and visual references inform this package. In case of conflict, the latest documented canonical decision above wins. The written PRD is authoritative for Juancito’s species (prairie dog), even if a reference image labels a character differently. Before production, culturally specific imagery, wording, and traditions receive Sonoran cultural review.
+The supplied PRD and visual references inform this package. In case of conflict, the latest documented canonical decision above wins. The written PRD is authoritative for Juancito’s species (prairie dog), even if a reference image labels a character differently. External Sonoran cultural review has not yet been performed; metadata must continue to say so until a named review actually occurs.

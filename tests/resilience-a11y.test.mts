@@ -68,6 +68,7 @@ test("reduced motion preference is preserved across profile migration", () => {
   const legacyProfile = {
     schemaVersion: 1,
     profileId: "local-primary",
+    appearance: {},
     settings: { music: true, sfx: true, reducedMotion: true },
   };
 

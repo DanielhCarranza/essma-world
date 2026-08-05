@@ -16,12 +16,20 @@ body {
   margin: 0;
   color: var(--ink);
   background: #f0c474;
-  font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+  font-family: var(--font-outfit), "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+}
+h1, h2, h3, .brand span, .ranch-title strong {
+  font-family: var(--font-fredoka), "Trebuchet MS", sans-serif;
 }
 button {
   font: inherit;
   color: inherit;
   cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+button:active:not(:disabled) {
+  transform: translateY(3px) !important;
 }
 .game-shell {
   min-height: 100svh;

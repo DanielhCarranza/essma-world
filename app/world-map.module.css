@@ -67,14 +67,31 @@
   z-index: 1;
   top: clamp(17px, 4vh, 42px);
   left: 50%;
-  width: min(320px, 82vw);
+  width: min(340px, 86vw);
   transform: translateX(-50%);
   text-align: center;
-  text-shadow: 0 2px 0 #fff3d2, 0 0 12px #fff3d2;
+  background: rgba(255, 241, 207, 0.94);
+  border: 3px solid #74402d;
+  border-radius: 20px;
+  padding: 8px 16px;
+  box-shadow: 0 5px 0 #572e1f, 0 0 16px rgba(255, 235, 179, 0.6);
 }
 
-.titleBlock p { margin: 0 0 2px; font-size: 14px; font-weight: 900; }
-.titleBlock h1 { margin: 0; font-size: clamp(25px, 4.2vw, 39px); line-height: 1; letter-spacing: -1px; }
+.titleBlock p {
+  margin: 0 0 2px;
+  font-family: var(--font-fredoka), sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c25217;
+}
+
+.titleBlock h1 {
+  margin: 0;
+  font-family: var(--font-fredoka), sans-serif;
+  font-size: clamp(24px, 4vw, 36px);
+  line-height: 1;
+  color: #573022;
+}
 
 .mapControls { position: absolute; inset: 0; z-index: 2; }
 

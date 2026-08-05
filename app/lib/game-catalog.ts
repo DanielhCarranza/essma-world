@@ -253,6 +253,16 @@ export const characters: readonly CharacterDefinition[] = [
   },
 ] as const;
 
+const defaultZIndexForSlot: Record<WearableSlot, number> = {
+  shoes: 25,
+  outfit: 30,
+  body: 30,
+  neck: 35,
+  accessory: 35,
+  hair: 40,
+  head: 40,
+};
+
 function wearable(
   id: string,
   target: CharacterId,
@@ -268,6 +278,14 @@ function wearable(
   const anchor = character?.anchors[slot];
   if (!anchor) throw new Error(`Missing ${slot} anchor for ${target}`);
   const slug = id.replace("wearable.", "");
+
+  const resolvedZIndex =
+    zIndex > 0
+      ? slot === "hair" && zIndex < 20
+        ? zIndex
+        : defaultZIndexForSlot[slot] || zIndex
+      : defaultZIndexForSlot[slot] || 30;
+
   return {
     id,
     version: assetVersion,
@@ -275,7 +293,7 @@ function wearable(
     target,
     slot,
     anchor,
-    zIndex,
+    zIndex: resolvedZIndex,
     locale: { "es-MX": { name, description } },
     unlock,
     asset: originalAsset(

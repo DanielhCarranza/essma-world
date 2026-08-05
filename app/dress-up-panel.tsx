@@ -187,28 +187,30 @@ export default function DressUpPanel({
         >
           ← <span>Rancho</span>
         </button>
-        <h1>Vestir a {character.locale["es-MX"].name}</h1>
+
+        {onChooseCharacter ? (
+          <nav className={styles.friends} aria-label="Elige un amigo">
+            {characters.map((friend) => (
+              <button
+                type="button"
+                key={friend.id}
+                onClick={() => onChooseCharacter(friend.id)}
+                aria-pressed={friend.id === characterId}
+                className={friend.id === characterId ? styles.friendSelected : ""}
+              >
+                <img src={friend.asset.thumbnailPath} alt="" />
+                <span>{friend.locale["es-MX"].name}</span>
+              </button>
+            ))}
+          </nav>
+        ) : (
+          <h1>Vestir a {character.locale["es-MX"].name}</h1>
+        )}
+
         <button type="button" className={styles.done} onClick={onDone}>
           ¡Listo! <span aria-hidden="true">✓</span>
         </button>
       </header>
-
-      {onChooseCharacter && (
-        <nav className={styles.friends} aria-label="Elige un amigo">
-          {characters.map((friend) => (
-            <button
-              type="button"
-              key={friend.id}
-              onClick={() => onChooseCharacter(friend.id)}
-              aria-pressed={friend.id === characterId}
-              className={friend.id === characterId ? styles.friendSelected : ""}
-            >
-              <img src={friend.asset.thumbnailPath} alt="" />
-              <span>{friend.locale["es-MX"].name}</span>
-            </button>
-          ))}
-        </nav>
-      )}
 
       <div className={styles.content}>
         <section

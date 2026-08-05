@@ -44,9 +44,6 @@ export function resolveAppearance(appearance: Appearance, characterId: Character
   const layers = Object.values(appearance[characterId])
     .map((id) => id && getWearable(id))
     .filter((item): item is WearableDefinition => Boolean(item && item.target === characterId));
-  if (characterId === "essma" && appearance.essma.outfit) {
-    layers.push(ESSMA_HANDS_OVERLAY);
-  }
   layers.sort((a, b) => a.zIndex - b.zIndex);
   return Object.freeze({ character, layers: Object.freeze(layers) });
 }

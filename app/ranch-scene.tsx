@@ -71,7 +71,7 @@ export default function RanchScene({
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host) return;
+    if (!host || typeof window === "undefined") return;
     let cancelled = false;
 
     void import("phaser")

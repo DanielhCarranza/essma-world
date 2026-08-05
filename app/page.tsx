@@ -78,11 +78,13 @@ function useSound(settings: PlayerProfile["settings"]) {
   return { play, startMusic };
 }
 
+const STABLE_STARTER_DATE = "2026-08-04T00:00:00.000Z";
+
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("map");
   const [selected, setSelected] = useState<CharacterId>("essma");
   const [profile, setProfile] = useState<PlayerProfile>(() =>
-    createStarterProfile(),
+    createStarterProfile(STABLE_STARTER_DATE),
   );
   const [hydrated, setHydrated] = useState(false);
   const [notice, setNotice] = useState("");

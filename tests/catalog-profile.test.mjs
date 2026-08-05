@@ -50,10 +50,10 @@ test("catalog contains four anchored bases and compatible wearables", () => {
       ]),
     ),
     {
-      essma: 9,
-      juancito: 4,
-      tori: 4,
-      anita: 4,
+      essma: 20,
+      juancito: 15,
+      tori: 15,
+      anita: 15,
     },
   );
   assert.deepEqual(

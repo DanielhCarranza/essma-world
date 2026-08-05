@@ -115,13 +115,26 @@ the game promise.
 ## Visual and interaction quality
 
 - Treat the reference pack as the ambition bar, not a layout to trace. Favor a
-  single clear focal action, roomy touch targets, visible selected/locked state,
+  single clear focal action, roomy touch targets (minimum 44x44px), visible selected/locked state,
   and an unobstructed ranch play area.
 - Test both a narrow mobile viewport and desktop. Check that map locations,
   character scale, dress layers, patio objects, modal stacking, and bottom
   navigation make immediate sense to a five-year-old.
 - Every interaction needs visible feedback and a recovery path. Keep locked
   world regions clearly unavailable and avoid buttons whose purpose is unclear.
+- WebAudio and SFX must require an explicit initial user interaction (tap/click) to unlock on mobile browsers.
+- Honor `prefers-reduced-motion` and sound toggles before scene animations, particle systems, or audio contexts start.
+
+## Game development skills & subsystem guidelines
+
+When working on specific game subsystems, consult and apply the corresponding skills in `.agents/skills/`:
+
+- **Scene Lifecycle & Memory Cleanup**: Destroy Phaser canvas instances, WebGL shaders, textures, and unbind typed event listeners on unmount. Avoid memory leaks when switching views (`.agents/skills/optimize-threejs-games/SKILL.md`).
+- **Camera & Viewport Tuning**: Frame 2D ranch scene and 3D mini-games for responsiveness, smooth panning, and unobstructed focal areas across mobile and desktop (`.agents/skills/build-game-camera-controls/SKILL.md`).
+- **Audio Feedback**: Implement non-intrusive action sounds, spatial audio, sound-off controls, and mobile WebAudio unlock handlers (`.agents/skills/build-game-audio-feedback/SKILL.md`).
+- **Inventory & Decorator Mechanics**: Enforce deterministic drag-and-drop placement, slot compatibility, and atomic state updates via React host (`.agents/skills/build-game-inventory/SKILL.md`).
+- **VFX & Animations**: Use performant, accessible 2D/3D particle effects and telegraphs with fallback for low-power devices (`.agents/skills/create-game-vfx/SKILL.md`).
+- **Game Testing & Verification**: Run headless/headful browser checks, verify zero console errors, test touch/keyboard/mouse inputs, and test profile persistence integrity (`.agents/skills/test-playable-web-games/SKILL.md`).
 
 ## Development, tests, and handoff
 
@@ -157,3 +170,4 @@ and works with mouse/touch/keyboard at mobile and desktop sizes. Update the
 relevant production document, asset manifest/QA record, tests, and this guide
 when a durable decision or workflow changed. Report exactly what was verified,
 what is pending, and do not represent unperformed review as complete.
+

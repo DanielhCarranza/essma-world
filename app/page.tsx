@@ -349,15 +349,20 @@ export default function Home() {
   }
   function equip(itemId: string) {
     const item = getWearable(itemId);
-    if (!item || !canEquip(profile, selected, item.slot, itemId)) return;
+    if (!item) return;
+    const currentEquipped = profile.appearance[selected][item.slot];
+    const nextItemId = currentEquipped === itemId ? undefined : itemId;
+
+    if (nextItemId && !canEquip(profile, selected, item.slot, nextItemId)) return;
+
     updateProfile((current) => ({
       ...current,
       appearance: {
         ...current.appearance,
-        [selected]: { ...current.appearance[selected], [item.slot]: itemId },
+        [selected]: { ...current.appearance[selected], [item.slot]: nextItemId },
       },
     }));
-    setNotice("¡Qué bonito!");
+    setNotice(nextItemId ? "¡Qué bonito!" : "Ropita quitada");
     play("confirm");
   }
   function toggleSetting(key: keyof PlayerProfile["settings"]) {

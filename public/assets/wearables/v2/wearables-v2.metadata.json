@@ -55,7 +55,102 @@
       "id": "wearable.anita.chaleco-cielo",
       "file": "anita.chaleco-cielo.png",
       "spec": "sky-blue embroidered calf vest"
-    }
+    },
+    {
+      "id": "wearable.essma.monno-azul",
+      "file": "essma.monno-azul.png",
+      "spec": "signature cobalt-blue hair bow tie"
+    },
+    {
+      "id": "wearable.essma.corona-flores",
+      "file": "essma.corona-flores.png",
+      "spec": "desert wildflower crown"
+    },
+    {
+      "id": "wearable.essma.gorrito-campesino",
+      "file": "essma.gorrito-campesino.png",
+      "spec": "woven straw sun visor bonnet"
+    },
+    {
+      "id": "wearable.essma.tunica-clasica",
+      "file": "essma.tunica-clasica.png",
+      "spec": "canonical default cream embroidered tunic and cobalt skirt"
+    },
+    {
+      "id": "wearable.essma.overol-mezclilla",
+      "file": "essma.overol-mezclilla.png",
+      "spec": "denim dungarees and yellow shirt"
+    },
+    {
+      "id": "wearable.essma.vestido-festivo",
+      "file": "essma.vestido-festivo.png",
+      "spec": "marigold festive ruffle dress"
+    },
+    {
+      "id": "wearable.essma.huaraches-piel",
+      "file": "essma.huaraches-piel.png",
+      "spec": "handcrafted leather huarache sandals"
+    },
+    {
+      "id": "wearable.essma.tenis-sol",
+      "file": "essma.tenis-sol.png",
+      "spec": "yellow canvas sneakers"
+    },
+    {
+      "id": "wearable.essma.zapatitos-rojos",
+      "file": "essma.zapatitos-rojos.png",
+      "spec": "red festive shoes with gold buckle"
+    },
+    {
+      "id": "wearable.essma.panuelo-cobalto",
+      "file": "essma.panuelo-cobalto.png",
+      "spec": "cobalt blue neck kerchief"
+    },
+    {
+      "id": "wearable.essma.canastita-flores",
+      "file": "essma.canastita-flores.png",
+      "spec": "wicker basket with wildflowers"
+    },
+    {
+      "id": "wearable.essma.pulserita-cuentas",
+      "file": "essma.pulserita-cuentas.png",
+      "spec": "colorful beaded wristlet"
+    },
+    { "id": "wearable.juancito.sombrerito-palma", "file": "juancito.sombrerito-palma.png", "spec": "palm straw hat" },
+    { "id": "wearable.juancito.casquito-explorador", "file": "juancito.casquito-explorador.png", "spec": "explorer helmet" },
+    { "id": "wearable.juancito.corona-cactus", "file": "juancito.corona-cactus.png", "spec": "pitaya cactus flower crown" },
+    { "id": "wearable.juancito.gorrito-noche", "file": "juancito.gorrito-noche.png", "spec": "soft blue night cap" },
+    { "id": "wearable.juancito.panuelo-rojo", "file": "juancito.panuelo-rojo.png", "spec": "bright red neck kerchief" },
+    { "id": "wearable.juancito.collar-semillas", "file": "juancito.collar-semillas.png", "spec": "handcrafted seed necklace" },
+    { "id": "wearable.juancito.mono-mariposa", "file": "juancito.mono-mariposa.png", "spec": "yellow butterfly bow tie" },
+    { "id": "wearable.juancito.bufandita-tejida", "file": "juancito.bufandita-tejida.png", "spec": "woven blue scarf" },
+    { "id": "wearable.juancito.sarape-sonora", "file": "juancito.sarape-sonora.png", "spec": "colorful Sonoran sarape" },
+    { "id": "wearable.juancito.chaleco-cuero", "file": "juancito.chaleco-cuero.png", "spec": "brown leather vest" },
+    { "id": "wearable.juancito.overolcito-trabajo", "file": "juancito.overolcito-trabajo.png", "spec": "mini denim overalls" },
+
+    { "id": "wearable.tori.sombrero-pluma", "file": "tori.sombrero-pluma.png", "spec": "leather hat with feather" },
+    { "id": "wearable.tori.diadema-estrellita", "file": "tori.diadema-estrellita.png", "spec": "golden star headband" },
+    { "id": "wearable.tori.gorrito-tejido", "file": "tori.gorrito-tejido.png", "spec": "orange woven beanie" },
+    { "id": "wearable.tori.viserita-sol", "file": "tori.viserita-sol.png", "spec": "yellow sun visor" },
+    { "id": "wearable.tori.collar-flores", "file": "tori.collar-flores.png", "spec": "tropical flower lei" },
+    { "id": "wearable.tori.panuelo-amarillo", "file": "tori.panuelo-amarillo.png", "spec": "yellow neck kerchief" },
+    { "id": "wearable.tori.gargantilla-cuentas", "file": "tori.gargantilla-cuentas.png", "spec": "turquoise beaded choker" },
+    { "id": "wearable.tori.ponchito-rayas", "file": "tori.ponchito-rayas.png", "spec": "striped wool poncho" },
+    { "id": "wearable.tori.chaleco-denim", "file": "tori.chaleco-denim.png", "spec": "modern denim vest" },
+    { "id": "wearable.tori.capita-bosque", "file": "tori.capita-bosque.png", "spec": "forest green cape" },
+    { "id": "wearable.tori.tunicas-flores", "file": "tori.tunicas-flores.png", "spec": "floral tunic" },
+
+    { "id": "wearable.anita.sombrero-vaquero", "file": "anita.sombrero-vaquero.png", "spec": "cowgirl hat" },
+    { "id": "wearable.anita.mono-rosa", "file": "anita.mono-rosa.png", "spec": "pink ear bow" },
+    { "id": "wearable.anita.gorrito-campana", "file": "anita.gorrito-campana.png", "spec": "lace bell bonnet" },
+    { "id": "wearable.anita.diadema-girasol", "file": "anita.diadema-girasol.png", "spec": "sunflower headband" },
+    { "id": "wearable.anita.campanilla-dorada", "file": "anita.campanilla-dorada.png", "spec": "golden cow bell necklace" },
+    { "id": "wearable.anita.panuelo-marigold", "file": "anita.panuelo-marigold.png", "spec": "marigold kerchief" },
+    { "id": "wearable.anita.collar-corazon", "file": "anita.collar-corazon.png", "spec": "pink heart collar" },
+    { "id": "wearable.anita.panuelo-verde", "file": "anita.panuelo-verde.png", "spec": "meadow green scarf" },
+    { "id": "wearable.anita.mantita-tejida", "file": "anita.mantita-tejida.png", "spec": "woven saddle blanket" },
+    { "id": "wearable.anita.overol-granja", "file": "anita.overol-granja.png", "spec": "farm denim overalls" },
+    { "id": "wearable.anita.falda-floreada", "file": "anita.falda-floreada.png", "spec": "pink floral apron skirt" }
   ],
   "qa": {
     "alphaChecked": true,

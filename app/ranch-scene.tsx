@@ -126,6 +126,10 @@ export default function RanchScene({
             wearables.forEach((item) =>
               this.load.image(`wearable:${item.id}`, item.asset.runtimePath),
             );
+            this.load.image(
+              "wearable:wearable.essma.hands-overlay",
+              "/assets/characters/v1/essma-hands.png",
+            );
             cameos.forEach((cameo) =>
               this.load.image(`cameo:${cameo.id}`, cameo.asset.runtimePath),
             );
@@ -348,8 +352,9 @@ export default function RanchScene({
                   .setPosition(x, y)
                   .setSize(this.figureSize * 1.16, this.figureSize * 1.3);
                 label
-                  .setPosition(x, y + this.figureSize * 0.62)
-                  .setFontSize(`${Math.max(12, this.figureSize * 0.12)}px`);
+                  .setPosition(x, y - this.figureSize * 0.58)
+                  .setOrigin(0.5, 1.0)
+                  .setFontSize(`${Math.max(12, this.figureSize * 0.11)}px`);
               },
             );
           }

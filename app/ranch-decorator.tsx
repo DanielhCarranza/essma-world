@@ -46,15 +46,24 @@ export default function RanchDecorator({
     : [];
 
   function chooseDecor(decorId: string) {
-    onSelectedDecorChange?.(selectedDecorId === decorId ? null : decorId);
-    setSelectedZoneId(null);
+    onSelectedDecorChange?.(decorId);
+    const decor = ranchDecor.find((entry) => entry.id === decorId);
+    if (!decor) return;
+    const targetZoneId =
+      decor.compatibleZoneIds.find(
+        (zoneId) => !layout.placements.some((p) => p.zoneId === zoneId),
+      ) ?? decor.compatibleZoneIds[0];
+
+    if (targetZoneId) {
+      onIntent({ type: "place-decor", decorId, zoneId: targetZoneId });
+      setSelectedZoneId(targetZoneId);
+    }
   }
 
   function chooseZone(zoneId: RanchPlacementZoneId) {
     setSelectedZoneId(zoneId);
     if (!selectedDecorId) return;
     onIntent({ type: "place-decor", decorId: selectedDecorId, zoneId });
-    onSelectedDecorChange?.(null);
   }
 
   function removeSelected() {
@@ -74,13 +83,13 @@ export default function RanchDecorator({
           <h2>Decora</h2>
         </div>
         <button className={styles.doneButton} type="button" onClick={onDone}>
-          Listo
+          ¡Listo! ✓
         </button>
       </header>
 
       <section className={styles.catalog} aria-label="Elige una decoración">
         <div className={styles.sectionHeading}>
-          <h3>Elige</h3>
+          <h3>Toca o arrastra</h3>
           <span>{selectedDecor ? selectedDecor.locale["es-MX"].name : ""}</span>
         </div>
         <div className={styles.decorGrid}>
@@ -99,6 +108,8 @@ export default function RanchDecorator({
                     : `Elegir ${decor.locale["es-MX"].name}`
                 }
                 disabled={isLocked}
+                draggable={!isLocked}
+                onDragStart={(e) => e.dataTransfer.setData("text/plain", decor.id)}
                 onClick={() => chooseDecor(decor.id)}
               >
                 <img

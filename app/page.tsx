@@ -544,40 +544,29 @@ export default function Home() {
               </section>
             )}
           </section>
-          <nav className="quick-actions" aria-label="Acciones principales">
-            <button
-              onClick={() => {
-                setScreen("map");
-                setDecorating(false);
-              }}
-            >
-              <span aria-hidden="true">🗺</span>
-              <small>Mapa</small>
-            </button>
-            <button onClick={openRanch}>
-              <span aria-hidden="true">⌂</span>
-              <small>Rancho</small>
-            </button>
-            <button onClick={() => openDress(selected)}>
-              <span aria-hidden="true">👗</span>
-              <small>Vestir</small>
-            </button>
-            <button onClick={openDecorator}>
-              <span aria-hidden="true">🌼</span>
-              <small>Decorar</small>
-            </button>
-          </nav>
         </>
       )}
       {notice && (
-        <aside className="message-card" aria-live="polite">
+        <aside className="message-card" aria-live="polite" onClick={() => setNotice("")}>
           <span>✦</span>
           <p>{notice}</p>
+          <button
+            type="button"
+            className="notice-close"
+            onClick={(e) => {
+              e.stopPropagation();
+              setNotice("");
+            }}
+            aria-label="Cerrar aviso"
+          >
+            ×
+          </button>
         </aside>
       )}
       {screen !== "map" && activeCameo && (
         <aside
           className="cameo-card"
+          onClick={() => setActiveCameo(null)}
           aria-label={
             cameos.find((cameo) => cameo.id === activeCameo)?.asset.alt
           }
@@ -595,6 +584,17 @@ export default function Home() {
                 .name
             }
           </p>
+          <button
+            type="button"
+            className="cameo-close"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveCameo(null);
+            }}
+            aria-label="Cerrar historia"
+          >
+            ×
+          </button>
         </aside>
       )}
       {dialog && (

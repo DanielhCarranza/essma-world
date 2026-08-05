@@ -351,7 +351,7 @@ export default function Home() {
     const item = getWearable(itemId);
     if (!item) return;
     const currentEquipped = profile.appearance[selected][item.slot];
-    const nextItemId = currentEquipped === itemId ? undefined : itemId;
+    const nextItemId = currentEquipped === itemId ? "" : itemId;
 
     if (nextItemId && !canEquip(profile, selected, item.slot, nextItemId)) return;
 

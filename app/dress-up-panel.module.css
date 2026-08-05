@@ -255,6 +255,22 @@
   box-shadow: 0 4px 0 #355727, 0 0 0 2px #a2d675;
 }
 
+.unequipButton {
+  border-color: #d97706;
+  background: #fffbeb;
+  color: #92400e;
+  box-shadow: 0 4px 0 #b45309;
+}
+
+.unequipButton:hover {
+  background: #fef3c7;
+}
+
+.unequipIcon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
 @media (max-width: 720px) {
   .header {
     grid-template-columns: 1fr auto;

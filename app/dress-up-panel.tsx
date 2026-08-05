@@ -171,6 +171,7 @@ export default function DressUpPanel({
     ? activeSlot
     : categories[0]?.slot;
   const visibleItems = unlocked.filter((item) => item.slot === currentSlot);
+  const currentlyEquippedId = currentSlot ? appearance[characterId][currentSlot] : undefined;
 
   return (
     <section
@@ -237,6 +238,19 @@ export default function DressUpPanel({
             ))}
           </nav>
           <div className={styles.items} aria-live="polite">
+            {currentlyEquippedId ? (
+              <button
+                type="button"
+                className={`${styles.item} ${styles.unequipButton}`}
+                onClick={() => onEquip(currentlyEquippedId)}
+                aria-label={`Quitar ${categoryForSlot[currentSlot]?.label || "ropa"}`}
+              >
+                <span className={styles.unequipIcon} aria-hidden="true">
+                  🚫
+                </span>
+                <span>Quitar</span>
+              </button>
+            ) : null}
             {visibleItems.map((item) => (
               <ItemButton
                 key={item.id}

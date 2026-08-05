@@ -126,19 +126,26 @@ function normalizeAppearance(
   return Object.fromEntries(
     CHARACTER_IDS.map((characterId) => {
       const inputLook = isRecord(input[characterId]) ? input[characterId] : {};
-      // Start every friend dressed. Explicit, compatible player choices then
-      // replace only their matching slots, retaining the rest of the look.
-      const look: Partial<Record<WearableSlot, string>> = Object.fromEntries(
-        Object.entries(defaultLookFor(characterId)).filter(([, itemId]) =>
-          unlockedItemIds.has(itemId),
-        ),
-      ) as Partial<Record<WearableSlot, string>>;
+      const look: Partial<Record<WearableSlot, string>> = {};
+      const defaults = defaultLookFor(characterId);
+
+      // Start with defaults for slots not specified in inputLook
+      for (const [slot, defaultItemId] of Object.entries(defaults)) {
+        if (!(slot in inputLook) && unlockedItemIds.has(defaultItemId)) {
+          look[slot as WearableSlot] = defaultItemId;
+        }
+      }
+
+      // Apply explicit player equipment or unselection
       for (const [slot, itemId] of Object.entries(inputLook)) {
         if (
+          typeof itemId === "string" &&
+          itemId !== "" &&
           isCompatibleWearable(characterId, slot as WearableSlot, itemId) &&
           unlockedItemIds.has(itemId)
-        )
+        ) {
           look[slot as WearableSlot] = itemId;
+        }
       }
       return [characterId, look];
     }),
@@ -166,8 +173,10 @@ function validAppearance(
     if (isRecord(look)) {
       for (const [slot, itemId] of Object.entries(look)) {
         if (
-          !isCompatibleWearable(characterId, slot as WearableSlot, itemId) ||
-          !unlockedItemIds.includes(itemId)
+          typeof itemId === "string" &&
+          itemId !== "" &&
+          (!isCompatibleWearable(characterId, slot as WearableSlot, itemId) ||
+            !unlockedItemIds.includes(itemId))
         )
           return false;
       }

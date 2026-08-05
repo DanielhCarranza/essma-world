@@ -5,6 +5,8 @@ async function snap() {
   const browser = await puppeteer.launch({
     executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: true,
+    pipe: true,
+    userDataDir: `/tmp/puppeteer_snap_${Date.now()}`,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
@@ -27,20 +29,28 @@ async function snap() {
   await page.screenshot({ path: `${outputDir}/verified_ranch.png` });
   console.log('Saved verified_ranch.png');
 
-  // 3. Click Vestir or tap Essma figure
+  // 3. Open Dress Up Panel for Essma
   await page.evaluate(() => {
     const btns = Array.from(document.querySelectorAll('button'));
     const vestir = btns.find(b => b.textContent && (b.textContent.includes('Vestir') || b.textContent.includes('Essma')));
-    if (vestir) {
-      vestir.click();
-    } else {
-      const canvas = document.querySelector('canvas');
-      if (canvas) canvas.dispatchEvent(new MouseEvent('click', { clientX: 640, clientY: 500, bubbles: true }));
-    }
+    if (vestir) vestir.click();
   });
   await new Promise(r => setTimeout(r, 2000));
   await page.screenshot({ path: `${outputDir}/verified_dressup.png` });
   console.log('Saved verified_dressup.png');
+
+  // 4. Test Friend Picker for Juancito, Tori, Anita
+  const friends = ['Juancito', 'Tori', 'Anita'];
+  for (const name of friends) {
+    await page.evaluate((friendName) => {
+      const btns = Array.from(document.querySelectorAll('button'));
+      const friendBtn = btns.find(b => b.textContent && b.textContent.includes(friendName));
+      if (friendBtn) friendBtn.click();
+    }, name);
+    await new Promise(r => setTimeout(r, 1500));
+    await page.screenshot({ path: `${outputDir}/verified_dressup_${name.toLowerCase()}.png` });
+    console.log(`Saved verified_dressup_${name.toLowerCase()}.png`);
+  }
 
   await browser.close();
 }

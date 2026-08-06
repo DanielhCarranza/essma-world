@@ -460,8 +460,9 @@ export default function Home() {
   }
   function startAdultHold() {
     cancelAdultHold();
-    const started = performance.now();
+    let started: number | null = null;
     const advance = (now: number) => {
+      if (started === null) started = now;
       const progress = Math.min(1, (now - started) / 2000);
       setHoldProgress(progress);
       if (progress >= 1) {

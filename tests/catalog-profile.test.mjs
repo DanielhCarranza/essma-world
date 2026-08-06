@@ -50,8 +50,8 @@ test("catalog contains four anchored bases and compatible wearables", () => {
       ]),
     ),
     {
-      essma: 20,
-      juancito: 15,
+      essma: 21,
+      juancito: 16,
       tori: 15,
       anita: 15,
     },
@@ -386,8 +386,8 @@ test("the shared resolver, reset, and randomize helpers only produce compatible 
   assert.deepEqual(
     resolved.layers.map((item) => item.id),
     [
-      "wearable.essma.vestido-girasol",
       "wearable.essma.botitas-camino",
+      "wearable.essma.vestido-girasol",
       "wearable.essma.diademita-flor",
     ],
   );

@@ -245,7 +245,9 @@ export default function DressUpPanel({
                 type="button"
                 className={`${styles.item} ${styles.unequipButton}`}
                 onClick={() => onEquip(currentlyEquippedId)}
-                aria-label={`Quitar ${categoryForSlot[currentSlot]?.label || "ropa"}`}
+                aria-label={`Quitar ${
+                  currentSlot ? categoryForSlot[currentSlot].label : "ropa"
+                }`}
               >
                 <span className={styles.unequipIcon} aria-hidden="true">
                   🚫

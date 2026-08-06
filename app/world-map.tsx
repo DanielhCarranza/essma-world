@@ -83,17 +83,21 @@ export default function WorldMap({
   initialWelcome = true,
 }: WorldMapProps) {
   const [soonPlace, setSoonPlace] = useState<string | null>(null);
-  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dismissTimer = useRef<number | null>(null);
 
   useEffect(
     () => () => {
-      if (dismissTimer.current) window.clearTimeout(dismissTimer.current);
+      if (dismissTimer.current !== null) {
+        window.clearTimeout(dismissTimer.current);
+      }
     },
     [],
   );
 
   const announceSoon = (label: string) => {
-    if (dismissTimer.current) window.clearTimeout(dismissTimer.current);
+    if (dismissTimer.current !== null) {
+      window.clearTimeout(dismissTimer.current);
+    }
     setSoonPlace(label);
     dismissTimer.current = window.setTimeout(() => setSoonPlace(null), 1800);
   };

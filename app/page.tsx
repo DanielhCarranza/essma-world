@@ -26,6 +26,7 @@ import WorldMap from "./world-map";
 import DressUpPanel from "./dress-up-panel";
 import RanchDecorator, { RanchDecoratorIntent } from "./ranch-decorator";
 import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
+import { CareActivity, CARE_REWARD_IDS } from "./care-activity";
 import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
 
 type Screen = "map" | "ranch" | "dress";
@@ -96,6 +97,8 @@ export default function Home() {
   const [selectedDecorId, setSelectedDecorId] = useState<string | null>(null);
   const [decorHistory, setDecorHistory] = useState<RanchLayout[]>([]);
   const [showGardenActivity, setShowGardenActivity] = useState(false);
+  const [showCareActivity, setShowCareActivity] = useState(false);
+  const [careCelebrate, setCareCelebrate] = useState<CharacterId | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [holdProgress, setHoldProgress] = useState(0);
   const [pendingImport, setPendingImport] = useState<PlayerProfile | null>(
@@ -151,6 +154,55 @@ export default function Home() {
     if (applyRes.status === "saved" && applyRes.awardedIds.length > 0) {
       setNotice("¡Nuevo regalo desbloqueado en tu colección!");
       play("confirm");
+    }
+  }
+
+  async function handleCareFinish(result: MiniGameResult) {
+    setShowCareActivity(false);
+    if (result.status !== "completed") return;
+
+    const miniGamePlayer = {
+      profileId: profile.profileId,
+      unlockedIds: [...profile.unlocks.itemIds, ...profile.unlocks.decorIds],
+    };
+    const policy = {
+      allowedUnlockIds: new Set<string>(CARE_REWARD_IDS),
+    };
+    const applyRes = await applyMiniGameResult(
+      miniGamePlayer,
+      result,
+      policy,
+      {
+        save: async (nextPlayer) => {
+          updateProfile((current) => {
+            const newItemIds = nextPlayer.unlockedIds.filter((id) =>
+              getWearable(id),
+            );
+            const newDecorIds = nextPlayer.unlockedIds.filter((id) =>
+              ranchDecor.some((d) => d.id === id),
+            );
+            return {
+              ...current,
+              unlocks: {
+                ...current.unlocks,
+                itemIds: Array.from(
+                  new Set([...current.unlocks.itemIds, ...newItemIds]),
+                ),
+                decorIds: Array.from(
+                  new Set([...current.unlocks.decorIds, ...newDecorIds]),
+                ),
+              },
+            };
+          });
+        },
+      },
+    );
+
+    if (applyRes.status === "saved" && applyRes.awardedIds.length > 0) {
+      setNotice("¡Nuevo adorno!");
+      play("confirm");
+      setCareCelebrate("juancito");
+      window.setTimeout(() => setCareCelebrate(null), 1800);
     }
   }
 
@@ -475,6 +527,7 @@ export default function Home() {
                   reducedMotion={profile.settings.reducedMotion}
                   decorating={decorating}
                   selectedDecorId={selectedDecorId}
+                  celebrateCharacter={careCelebrate}
                   onEvent={handleRanchEvent}
                 />
                 {decorating && (
@@ -511,6 +564,14 @@ export default function Home() {
                       <span aria-hidden="true">🌱</span>
                       <b>Jardín</b>
                     </button>
+                    <button
+                      className="decorate-launch care-launch"
+                      type="button"
+                      onClick={() => setShowCareActivity(true)}
+                    >
+                      <span aria-hidden="true">🐾</span>
+                      <b>Cuidar</b>
+                    </button>
                   </div>
                 )}
                 {showGardenActivity && (
@@ -527,6 +588,22 @@ export default function Home() {
                       locale: "es-MX",
                     }}
                     onFinish={handleGardenFinish}
+                  />
+                )}
+                {showCareActivity && (
+                  <CareActivity
+                    context={{
+                      player: {
+                        profileId: profile.profileId,
+                        unlockedIds: [
+                          ...profile.unlocks.itemIds,
+                          ...profile.unlocks.decorIds,
+                        ],
+                      },
+                      settings: profile.settings,
+                      locale: "es-MX",
+                    }}
+                    onFinish={handleCareFinish}
                   />
                 )}
               </div>

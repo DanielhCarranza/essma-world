@@ -30,6 +30,7 @@ type RanchSceneProps = {
   selectedCharacter: CharacterId;
   decorating?: boolean;
   selectedDecorId?: string | null;
+  celebrateCharacter?: CharacterId | null;
 };
 
 type SceneSnapshot = Pick<
@@ -40,6 +41,7 @@ type SceneSnapshot = Pick<
   | "selectedCharacter"
   | "decorating"
   | "selectedDecorId"
+  | "celebrateCharacter"
 >;
 
 const friends: Array<{ id: CharacterId; x: number; y: number }> = [
@@ -57,6 +59,7 @@ export default function RanchScene({
   selectedCharacter,
   decorating = false,
   selectedDecorId = null,
+  celebrateCharacter = null,
 }: RanchSceneProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const eventRef = useRef(onEvent);
@@ -114,6 +117,12 @@ export default function RanchScene({
           >();
           private figureSize = 212;
           private pulse?: Phaser.Tweens.Tween;
+          private celebrateTween?: Phaser.Tweens.Tween;
+          private celebrateParticles: Phaser.GameObjects.Arc[] = [];
+          private celebrating = false;
+          private celebratingCharacter: CharacterId | null = null;
+          private previousCelebrateCharacter: CharacterId | null | undefined =
+            undefined;
 
           preload() {
             this.load.image("rancho", "/assets/rancho-de-essma-v1.png");
@@ -259,6 +268,85 @@ export default function RanchScene({
               selectedCharacter,
               decorating,
               selectedDecorId,
+              celebrateCharacter,
+            });
+          }
+
+          private stopCelebrate() {
+            this.celebrateTween?.stop();
+            this.celebrateTween = undefined;
+            this.celebrateParticles.forEach((particle) => particle.destroy());
+            this.celebrateParticles = [];
+            this.celebrating = false;
+            this.celebratingCharacter = null;
+          }
+
+          private spawnSparkles(x: number, y: number) {
+            const colors = [0xffe066, 0xffc857, 0xffffff];
+            for (let i = 0; i < 5; i++) {
+              const angle = (Math.PI * 2 * i) / 5 + Math.random() * 0.4;
+              const dist = 18 + Math.random() * 28;
+              const star = this.add
+                .circle(x, y, 3 + Math.random() * 3, colors[i % colors.length], 0.92)
+                .setDepth(950);
+              this.celebrateParticles.push(star);
+              this.tweens.add({
+                targets: star,
+                x: x + Math.cos(angle) * dist,
+                y: y + Math.sin(angle) * dist - 12,
+                alpha: 0,
+                scale: 0.15,
+                duration: 480 + Math.random() * 180,
+                ease: "Quad.easeOut",
+                onComplete: () => {
+                  star.destroy();
+                  const index = this.celebrateParticles.indexOf(star);
+                  if (index >= 0) this.celebrateParticles.splice(index, 1);
+                },
+              });
+            }
+          }
+
+          private playCelebrate(
+            characterId: CharacterId,
+            selectedCharacter: CharacterId,
+            reducedMotion: boolean,
+          ) {
+            this.stopCelebrate();
+            const figure = this.figures.get(characterId);
+            if (!figure) return;
+
+            this.celebrating = true;
+            this.celebratingCharacter = characterId;
+            const { frame, base } = figure;
+            const restScale = characterId === selectedCharacter ? 1.08 : 1;
+
+            if (reducedMotion) {
+              base.setTint(0xfff4c7);
+              this.time.delayedCall(160, () => {
+                base.clearTint();
+                this.celebrating = false;
+                this.celebratingCharacter = null;
+              });
+              return;
+            }
+
+            const sparkleY = frame.y - this.figureSize * 0.42;
+            this.spawnSparkles(frame.x, sparkleY);
+
+            this.celebrateTween = this.tweens.add({
+              targets: frame,
+              scaleX: restScale * 1.07,
+              scaleY: restScale * 1.07,
+              y: frame.y - 10,
+              duration: 360,
+              yoyo: true,
+              ease: "Sine.easeInOut",
+              onComplete: () => {
+                frame.setScale(restScale);
+                this.celebrating = false;
+                this.celebratingCharacter = null;
+              },
             });
           }
 
@@ -412,11 +500,27 @@ export default function RanchScene({
                 else frame.add(layer);
                 layers.push(layer);
               });
-              frame.setScale(
-                characterId === snapshot.selectedCharacter ? 1.08 : 1,
-              );
+              if (
+                !(
+                  this.celebrating &&
+                  characterId === this.celebratingCharacter
+                )
+              ) {
+                frame.setScale(
+                  characterId === snapshot.selectedCharacter ? 1.08 : 1,
+                );
+              }
             });
-            if (!snapshot.reducedMotion) {
+            const celebrate = snapshot.celebrateCharacter ?? null;
+            if (celebrate && celebrate !== this.previousCelebrateCharacter) {
+              this.playCelebrate(
+                celebrate,
+                snapshot.selectedCharacter,
+                snapshot.reducedMotion,
+              );
+            }
+            this.previousCelebrateCharacter = celebrate;
+            if (!snapshot.reducedMotion && !snapshot.celebrateCharacter) {
               const selected = this.figures.get(
                 snapshot.selectedCharacter,
               )?.frame;
@@ -433,6 +537,7 @@ export default function RanchScene({
           }
 
           shutdown() {
+            this.stopCelebrate();
             this.events.off("ranch:update", this.updateSnapshot, this);
             this.scale.off("resize", this.layoutScene, this);
           }
@@ -470,6 +575,7 @@ export default function RanchScene({
       selectedCharacter,
       decorating,
       selectedDecorId,
+      celebrateCharacter,
     } satisfies SceneSnapshot);
   }, [
     appearance,
@@ -478,6 +584,7 @@ export default function RanchScene({
     selectedCharacter,
     decorating,
     selectedDecorId,
+    celebrateCharacter,
   ]);
 
   return (

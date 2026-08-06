@@ -18,15 +18,18 @@ readiness, and absence of text, logos, copied poses, or branded elements.
 | Anita base                               | 91/100    | Pending final product approval                                                                                                                                    |
 | Essma base                               | 88/100    | Approved release candidate: dark curls, blue bow, light complexion, young child identity with non-obtrusive neutral base |
 | Original world map, landscape + portrait | 89–92/100 | Pending final product approval                                                                                                                                    |
-| Twenty wearable layers (v1 + v2)         | 87–94/100 | Pending final product approval                                                                                                                                    |
+| ~65 wearable layers (v1 + v2 expanded closet) | 87–94/100 (v1 baseline); v2 expanded closet pending full game-scale visual QA | Pending final product approval; v2 expanded closet still needs in-game anchor/alpha pass at ranch and dress-up scale |
 | Ten patio decoration layers              | 88–92/100 | Pending final product approval                                                                                                                                    |
 | Three cameo portraits                    | 88/100    | Pending final product approval                                                                                                                                    |
 
-The wearable pass included crop-and-place correction so every item shares its
-target character’s 1254px layer canvas. Runtime and thumbnail files were then
-checked for dimensions and alpha transparency. The decor pack uses 768px
-transparent runtime canvases and 256px thumbnails; the map has separately
-authored landscape and portrait files.
+The v1 wearable pass included crop-and-place correction so every item shares
+its target character’s 1254px layer canvas. The v2 expanded closet (~65 items,
+5+ per slot across Essma, Juancito, Tori, and Anita) still needs a full
+game-scale visual QA pass at ranch and dress-up scale; `productApproved` remains
+false and `culturalReview` remains `"not-performed"`. Runtime and thumbnail
+files were checked for dimensions and alpha transparency where present. The
+decor pack uses 768px transparent runtime canvases and 256px thumbnails; the
+map has separately authored landscape and portrait files.
 
 ## Provenance and processing
 

@@ -30,8 +30,11 @@ not replace it with parallel systems.
   keyboard-accessible React equivalents, original background, and three
   teaser cameos (Loro Loco, Oso Taquito, Capybara).
 - **Creative loop:** four dressable friends (Essma, Juancito, Tori, Anita),
-  default looks, 20 catalogued wearable layers, 10 snap-safe patio decorations,
+  default looks, 65 catalogued wearable layers (5+ per slot across Essma,
+  Juancito, Tori, and Anita), 10 snap-safe patio decorations,
   placement/removal/undo/reset, and shared React/Phaser appearance resolution.
+- **Garden activity (P1):** “Cuida el jardín” two-minute visual discovery
+  loop with host-validated cosmetic rewards (gardener hat + sunflower pot).
 - **Data foundation:** catalog v2; validated local IndexedDB player profile
   schema v4; migrations; versioned asset paths and pack manifests; guarded
   adult export/import with confirmation.
@@ -189,10 +192,14 @@ be complete or explicitly deferred behind a non-player-facing feature flag.
 - Deployment is reachable over HTTPS with no child-data collection path and a
   tested rollback owner/process.
 
-## P1 — Next playable slice: one gentle ranch activity
+## P1 — Garden activity (implemented)
 
-This is the first scope expansion after P0. It must be a complete, repeatable
-loop—not a set of unused systems.
+P1.1 “Cuida el jardín” is implemented on the current branch with the existing
+`MiniGameModule`/`MiniGameResult` contract, host-validated rewards, and
+collection persistence. The **next playable slice** is **Animal Care** under
+**P2 — Cozy Ranch Expansion** (see below).
+
+This section documents the completed P1 scope for reference.
 
 ### P1.1 “Cuida el jardín” or equivalent visual discovery activity
 
@@ -255,9 +262,12 @@ child for leaving.
 - Lock state is understandable without color or a long reading task; there is
   no shop, currency, scarcity timer, streak, or purchase surface.
 
-## P2 — Cozy ranch expansion
+## P2 — Cozy ranch expansion (next slice: Animal Care)
 
-P2 adds depth around the proven activity. Ship each row as a small playable
+P2 adds depth around the proven garden activity. The highest-priority next
+slice is a gentle **Animal Care** interaction (~2 minutes, no failure, no
+timer): feed, water, or brush a ranch friend and earn a cosmetic reward through
+the same validated mini-game host. Ship each row below as a small playable
 slice with its own asset pack and playtest, not as a long backlog sprint.
 
 | Slice | Dependencies | Definition of done |
@@ -359,19 +369,20 @@ Before a slice is marked complete:
 
 ## First ticket set for the next agent
 
-Work in this order; do not start P1 until the P0 gate is green.
+Work in this order; finish P0 gates before expanding P2 scope.
 
 1. Run the full P0 regression matrix on the exact release-candidate commit and
    create CI/browser smoke coverage for gaps found.
-2. Perform the Essma-base/layer visual pass; archive every generated source,
-   revise manifests/catalog QA, and obtain final product approval.
+2. Perform the Essma-base/layer visual pass on all 65 wearables; archive every
+   generated source, revise manifests/catalog QA, and obtain final product
+   approval.
 3. Conduct the small supervised usability study; ship only the child-facing
    clarity fixes it identifies, then rerun P0 checks.
-4. Make a one-page P1 activity brief, reward allowlist, and asset brief; have
-   cultural/content review before art generation.
-5. Implement the one activity end-to-end through the existing mini-game
-   contract and host validation, then playtest it before adding a second task
-   or opening a region.
+4. Make a one-page Animal Care activity brief, reward allowlist, and asset
+   brief; have cultural/content review before art generation.
+5. Implement Animal Care end-to-end through the existing mini-game contract and
+   host validation, then playtest it before adding a second ranch task or
+   opening a region.
 
 ## References
 

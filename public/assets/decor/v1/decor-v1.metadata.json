@@ -15,7 +15,9 @@
     { "id": "decor.cajon-cosecha", "file": "cajon-cosecha.png" },
     { "id": "decor.farol-papel", "file": "farol-papel.png" },
     { "id": "decor.molinillo-viento", "file": "molinillo-viento.png" },
-    { "id": "decor.banca-mesquite", "file": "banca-mesquite.png" }
+    { "id": "decor.banca-mesquite", "file": "banca-mesquite.png" },
+    { "id": "decor.rancho.maceta-girasol", "file": "maceta-girasol.png" },
+    { "id": "decor.rancho.maceta-corazon", "file": "maceta-corazon.png" }
   ],
   "qa": {
     "alphaChecked": true,

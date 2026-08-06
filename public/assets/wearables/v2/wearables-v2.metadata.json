@@ -22,6 +22,11 @@
       "spec": "soft straw travel hat with blue ribbon"
     },
     {
+      "id": "wearable.essma.sombrero-jardinero",
+      "file": "essma.sombrero-jardinero.png",
+      "spec": "wide-brim straw gardener hat with cobalt ribbon and sunflower accent"
+    },
+    {
       "id": "wearable.essma.bolsita-tejida",
       "file": "essma.bolsita-tejida.png",
       "spec": "small green woven hip satchel"
@@ -120,6 +125,7 @@
     { "id": "wearable.juancito.casquito-explorador", "file": "juancito.casquito-explorador.png", "spec": "explorer helmet" },
     { "id": "wearable.juancito.corona-cactus", "file": "juancito.corona-cactus.png", "spec": "pitaya cactus flower crown" },
     { "id": "wearable.juancito.gorrito-noche", "file": "juancito.gorrito-noche.png", "spec": "soft blue night cap" },
+    { "id": "wearable.juancito.gorrito-semillas", "file": "juancito.gorrito-semillas.png", "spec": "terracotta seed beanie reward from animal care" },
     { "id": "wearable.juancito.panuelo-rojo", "file": "juancito.panuelo-rojo.png", "spec": "bright red neck kerchief" },
     { "id": "wearable.juancito.collar-semillas", "file": "juancito.collar-semillas.png", "spec": "handcrafted seed necklace" },
     { "id": "wearable.juancito.mono-mariposa", "file": "juancito.mono-mariposa.png", "spec": "yellow butterfly bow tie" },

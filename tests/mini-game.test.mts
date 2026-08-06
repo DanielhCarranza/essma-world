@@ -91,3 +91,24 @@ test("garden activity reward policy unlocks allowlisted catalog items", async ()
   assert.deepEqual(outcome.awardedIds, ["decor.rancho.maceta-girasol"]);
   assert.equal(saves.length, 1);
 });
+
+test("care activity reward policy unlocks allowlisted catalog items", async () => {
+  const { CARE_REWARD_IDS } = await import("../app/care-activity.tsx");
+  const carePolicy: MiniGameRewardPolicy = {
+    allowedUnlockIds: new Set(CARE_REWARD_IDS),
+  };
+  const { adapter, saves } = persistence();
+  const outcome = await applyMiniGameResult(
+    player,
+    {
+      status: "completed",
+      rewards: [{ type: "unlock", catalogId: "decor.rancho.maceta-corazon" }],
+    },
+    carePolicy,
+    adapter,
+  );
+
+  assert.equal(outcome.status, "saved");
+  assert.deepEqual(outcome.awardedIds, ["decor.rancho.maceta-corazon"]);
+  assert.equal(saves.length, 1);
+});

@@ -658,6 +658,17 @@ export const wearables: readonly WearableDefinition[] = [
     2,
   ),
   wearable(
+    "wearable.juancito.gorrito-semillas",
+    "juancito",
+    "head",
+    "Gorrito de semillas",
+    "Gorrito tejido con semillas del rancho.",
+    30,
+    91,
+    2,
+    { type: "reward", activityId: "cuidar-amigos" },
+  ),
+  wearable(
     "wearable.juancito.panuelo-rojo",
     "juancito",
     "neck",
@@ -1277,6 +1288,14 @@ export const ranchDecor: readonly RanchDecorDefinition[] = [
     ["patio.puerta", "patio.macetas", "patio.flores"],
     92,
     { type: "reward", activityId: "cuida-el-jardin" },
+  ),
+  defineRanchDecor(
+    "decor.rancho.maceta-corazon",
+    "Maceta corazón",
+    "Maceta con flores en forma de corazón.",
+    ["patio.puerta", "patio.macetas", "patio.flores"],
+    91,
+    { type: "reward", activityId: "cuidar-amigos" },
   ),
 ] as const;
 

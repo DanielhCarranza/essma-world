@@ -37,22 +37,21 @@ Read the production package first:
 
 ---
 
-## Next implementation slice — Animal Care Activity
+## Completed this slice — Animal Care Activity ✅
 
-The highest-priority Phase 2 task is a **gentle animal care interaction** (~2 minutes, no failure, no timer):
+- Ranch action bar **Cuidar** opens `app/care-activity.tsx` (feed Juancito / water Anita / brush Tori; 2 taps each; ¡Gracias!).
+- Rewards via `CARE_REWARD_IDS` + React `applyMiniGameResult`: `wearable.juancito.gorrito-semillas`, `decor.rancho.maceta-corazon`.
+- Garden reward art filled in: `essma.sombrero-jardinero`, `maceta-girasol`.
+- Phaser `celebrateCharacter` prop plays a brief sparkle/pulse (skipped when reduced motion).
 
-1. **Entry**: A "Cuidar" button appears in the ranch action bar (alongside "Decorar" and "Jardín")
-2. **Activity**: The player taps/drags to feed Juancito seeds, water Anita's flowers, or brush Tori's tail — whichever animal is in the scene. Uses the existing Phaser hotspot system.
-3. **Completion**: A warm "¡Gracias!" moment with a sparkle animation (Phaser tweens, no Three.js). Returns a `MiniGameResult` through the existing contract.
-4. **Reward**: React host validates via `applyMiniGameResult`, unlocks one cosmetic item (hat, scarf, or decor). Shows "¡Nuevo adorno!" notice.
-5. **No**: failure states, timers, streaks, scores, currency, or external links.
+## Next implementation slice — Collection Feedback ("Mochila")
 
-### Architecture notes
+Highest-priority remaining Phase 2 task (Roadmap 2b):
 
-- The activity can follow the `GardenActivity` pattern in `app/garden-activity.tsx` — it renders as an overlay, receives a read-only context, and calls `onFinish(result)`.
-- Define reward IDs in a `CARE_REWARD_IDS` constant (new wearable/decor items in the catalog) and pass them through the mini-game policy.
-- The Phaser ranch scene should respond to a `"care-complete"` typed event by playing a brief idle animation on the cared-for character.
-- Do not add Three.js. Keep all animations as Phaser tweens or CSS transitions.
+1. **Mochila** panel listing earned/unlocked wearables and decor with thumbnails.
+2. Keyboard navigable, labeled; no punishing lock icons for a five-year-old.
+3. Caregiver-readable progress without dense text.
+4. Then Photo mode (2c), expanded decor (2d), ranch polish (2e).
 
 ---
 

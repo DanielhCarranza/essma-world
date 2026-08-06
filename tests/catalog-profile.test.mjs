@@ -17,6 +17,7 @@ const {
   getWearable,
   isCompatibleRanchPlacement,
   isCompatibleWearable,
+  pendingArtWearableIds,
   ranchDecor,
   ranchPlacementZones,
   starterRanchDecorIds,
@@ -165,7 +166,7 @@ test("a v1 profile migrates to normalized current state without unknown items", 
     result.profile.appearance.essma.outfit,
     "wearable.essma.vestido-girasol",
   );
-  assert.equal(result.profile.appearance.essma.head, undefined);
+  assert.equal(result.profile.appearance.essma.head, "");
   assert.equal(
     result.profile.appearance.tori.neck,
     "wearable.tori.panuelo-azul",
@@ -400,5 +401,76 @@ test("the shared resolver, reset, and randomize helpers only produce compatible 
     Object.values(randomized.tori).every((id) =>
       id?.startsWith("wearable.tori."),
     ),
+  );
+});
+
+test("playable closet excludes procedural pending-art wearables", () => {
+  assert.ok(pendingArtWearableIds.length >= 40);
+  assert.ok(pendingArtWearableIds.includes("wearable.essma.huaraches-piel"));
+  assert.ok(!starterWearableIds.includes("wearable.essma.huaraches-piel"));
+  assert.ok(starterWearableIds.includes("wearable.essma.botitas-camino"));
+  assert.ok(starterWearableIds.includes("wearable.essma.botitas-cobalto"));
+  const starter = createStarterProfile(NOW);
+  assert.ok(!starter.unlocks.itemIds.includes("wearable.essma.tenis-sol"));
+
+  const bloated = {
+    ...starter,
+    unlocks: {
+      ...starter.unlocks,
+      itemIds: [...starter.unlocks.itemIds, "wearable.essma.huaraches-piel"],
+    },
+    appearance: {
+      ...starter.appearance,
+      essma: {
+        ...starter.appearance.essma,
+        shoes: "wearable.essma.huaraches-piel",
+      },
+    },
+  };
+  const cleaned = validateAndMigrateProfile(bloated, NOW);
+  assert.equal(cleaned.ok, true);
+  if (!cleaned.ok) return;
+  assert.ok(
+    !cleaned.profile.unlocks.itemIds.includes("wearable.essma.huaraches-piel"),
+  );
+  assert.equal(
+    cleaned.profile.appearance.essma.shoes,
+    "wearable.essma.botitas-camino",
+  );
+});
+
+test("explicit unequip persists across normalize / save cycles", () => {
+  const starter = createStarterProfile(NOW);
+  const unequipped = {
+    ...starter,
+    appearance: {
+      ...starter.appearance,
+      essma: {
+        ...starter.appearance.essma,
+        shoes: "",
+        accessory: "",
+      },
+    },
+  };
+  const once = validateAndMigrateProfile(unequipped, NOW);
+  assert.equal(once.ok, true);
+  if (!once.ok) return;
+  assert.equal(once.profile.appearance.essma.shoes, "");
+  assert.equal(once.profile.appearance.essma.accessory, "");
+  assert.equal(
+    once.profile.appearance.essma.outfit,
+    "wearable.essma.vestido-girasol",
+  );
+
+  const twice = validateAndMigrateProfile(once.profile, NOW);
+  assert.equal(twice.ok, true);
+  if (!twice.ok) return;
+  assert.equal(twice.profile.appearance.essma.shoes, "");
+  assert.equal(twice.profile.appearance.essma.accessory, "");
+
+  const resolved = resolveAppearance(twice.profile.appearance, "essma");
+  assert.deepEqual(
+    resolved.layers.map((item) => item.id),
+    ["wearable.essma.vestido-girasol"],
   );
 });

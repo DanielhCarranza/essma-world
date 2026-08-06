@@ -179,9 +179,16 @@ export default function RanchScene({
                 .rectangle(0, 0, 94, 104, 0xffffff, 0)
                 .setInteractive({ useHandCursor: true })
                 .setDepth(21);
-              hit.on("pointerup", () =>
-                eventRef.current({ type: "show-story", story: cameo.id }),
-              );
+              hit.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+                // Ignore overlay/DOM hits that Phaser still maps into world space.
+                if (
+                  pointer.event?.target &&
+                  pointer.event.target !== this.game.canvas
+                ) {
+                  return;
+                }
+                eventRef.current({ type: "show-story", story: cameo.id });
+              });
               const shortName =
                 cameo.id === "loro"
                   ? "Loro"
@@ -209,12 +216,18 @@ export default function RanchScene({
                 .setVisible(false)
                 .setDepth(8)
                 .setInteractive({ useHandCursor: true });
-              target.on("pointerup", () =>
+              target.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+                if (
+                  pointer.event?.target &&
+                  pointer.event.target !== this.game.canvas
+                ) {
+                  return;
+                }
                 eventRef.current({
                   type: "choose-placement-zone",
                   zoneId: zone.id,
-                }),
-              );
+                });
+              });
               this.placementTargets.set(zone.id, target);
             });
 
@@ -230,12 +243,18 @@ export default function RanchScene({
                 .rectangle(0, 0, 172, 208, 0xffffff, 0)
                 .setInteractive({ useHandCursor: true })
                 .setDepth(924);
-              hit.on("pointerup", () =>
+              hit.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+                if (
+                  pointer.event?.target &&
+                  pointer.event.target !== this.game.canvas
+                ) {
+                  return;
+                }
                 eventRef.current({
                   type: "choose-character",
                   character: friend.id,
-                }),
-              );
+                });
+              });
               const label = this.add
                 .text(0, 0, character.locale["es-MX"].name, {
                   fontFamily: "Arial",
@@ -551,7 +570,9 @@ export default function RanchScene({
           backgroundColor: "#75412b",
           scene: RanchoScene,
           scale: { mode: Phaser.Scale.RESIZE },
-          input: { activePointers: 1 },
+          // Keep input on the canvas only so React chips (friends / Decorar)
+          // are not also interpreted as world hits on characters below.
+          input: { activePointers: 1, windowEvents: false },
           banner: false,
         });
         gameRef.current = game;
@@ -607,6 +628,9 @@ export default function RanchScene({
               <button
                 className="scene-character-control"
                 key={id}
+                type="button"
+                data-character-id={id}
+                onPointerDown={(event) => event.stopPropagation()}
                 onClick={() =>
                   onEvent({ type: "choose-character", character: id })
                 }
@@ -623,6 +647,8 @@ export default function RanchScene({
               <button
                 className="scene-cameo-control"
                 key={cameo.id}
+                type="button"
+                onPointerDown={(event) => event.stopPropagation()}
                 onClick={() => onEvent({ type: "show-story", story: cameo.id })}
               >
                 {cameo.id === "loro"
@@ -643,6 +669,8 @@ export default function RanchScene({
                 <button
                   className="scene-placement-control"
                   key={zone.id}
+                  type="button"
+                  onPointerDown={(event) => event.stopPropagation()}
                   onClick={() =>
                     onEvent({ type: "choose-placement-zone", zoneId: zone.id })
                   }

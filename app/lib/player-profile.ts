@@ -6,10 +6,13 @@ import {
   isCharacterId,
   isCompatibleRanchPlacement,
   isCompatibleWearable,
+  pendingArtWearableIds,
+  ranchDecor,
   RanchPlacementZoneId,
   starterRanchDecorIds,
   starterRegionIds,
   starterWearableIds,
+  wearables,
   WearableSlot,
   WORLD_REGION_IDS,
 } from "./game-catalog.js";
@@ -74,10 +77,17 @@ const defaultSettings: ProfileSettings = {
   sfx: true,
   reducedMotion: false,
 };
-const knownWearableIds = new Set(starterWearableIds);
-const knownDecorIds = new Set(starterRanchDecorIds);
+/** Every catalog wearable ID (including reward and pending-art rows). */
+const knownWearableIds = new Set(wearables.map((item) => item.id));
+/** Procedural placeholders withheld from the playable closet until regenerated. */
+const pendingArtWearableIdSet = new Set(pendingArtWearableIds);
+const knownDecorIds = new Set(ranchDecor.map((item) => item.id));
 const knownCompanionIds = new Set<string>(CHARACTER_IDS);
 const knownRegionIds = new Set<string>(WORLD_REGION_IDS);
+
+function withoutPendingArtWearables(ids: readonly string[]): string[] {
+  return ids.filter((id) => !pendingArtWearableIdSet.has(id));
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -129,22 +139,39 @@ function normalizeAppearance(
       const look: Partial<Record<WearableSlot, string>> = {};
       const defaults = defaultLookFor(characterId);
 
-      // Start with defaults for slots not specified in inputLook
+      // Defaults only fill slots the player never set (key absent).
       for (const [slot, defaultItemId] of Object.entries(defaults)) {
         if (!(slot in inputLook) && unlockedItemIds.has(defaultItemId)) {
           look[slot as WearableSlot] = defaultItemId;
         }
       }
 
-      // Apply explicit player equipment or unselection
+      // Explicit equipment, durable unequip (""), or drop unplayable IDs.
       for (const [slot, itemId] of Object.entries(inputLook)) {
+        const wearableSlot = slot as WearableSlot;
+        if (typeof itemId !== "string") continue;
+
+        // Empty string means the player cleared the slot — keep it empty.
+        if (itemId === "") {
+          look[wearableSlot] = "";
+          continue;
+        }
+
         if (
-          typeof itemId === "string" &&
-          itemId !== "" &&
-          isCompatibleWearable(characterId, slot as WearableSlot, itemId) &&
-          unlockedItemIds.has(itemId)
+          isCompatibleWearable(characterId, wearableSlot, itemId) &&
+          unlockedItemIds.has(itemId) &&
+          !pendingArtWearableIdSet.has(itemId)
         ) {
-          look[slot as WearableSlot] = itemId;
+          look[wearableSlot] = itemId;
+          continue;
+        }
+
+        // Unearned / pending-art / invalid: fall back to default when available.
+        const fallback = defaults[wearableSlot];
+        if (fallback && unlockedItemIds.has(fallback)) {
+          look[wearableSlot] = fallback;
+        } else {
+          look[wearableSlot] = "";
         }
       }
       return [characterId, look];
@@ -306,7 +333,9 @@ export function createStarterProfile(
 
 /** Normalizes only data that has already passed the import's structural checks. */
 export function normalizeProfile(value: PlayerProfile): PlayerProfile {
-  const unlockedItemIds = normalizeIds(value.unlocks.itemIds, knownWearableIds);
+  const unlockedItemIds = withoutPendingArtWearables(
+    normalizeIds(value.unlocks.itemIds, knownWearableIds),
+  );
   const usableItemIds = [
     ...new Set([...starterWearableIds, ...unlockedItemIds]),
   ];
@@ -379,7 +408,12 @@ function validateLegacyProfile(
   profile.updatedAt = value.updatedAt;
   profile.settings = normalizeSettings(value.settings);
   profile.unlocks = {
-    itemIds: [...new Set([...starterWearableIds, ...rawItems])],
+    itemIds: [
+      ...new Set([
+        ...starterWearableIds,
+        ...withoutPendingArtWearables(rawItems),
+      ]),
+    ],
     decorIds: [...starterRanchDecorIds],
     companionIds: normalizeIds(value.unlocks.companionIds, knownCompanionIds),
     regionIds: [

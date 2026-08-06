@@ -1,0 +1,4 @@
+{
+  "ranchError": "No pudimos abrir el rancho en este navegador. Aún puedes vestir a los amigos.",
+  "note": "Headless Chromium cannot boot Phaser ranch in this environment; dress CharacterPreview + static overlays used for fit judgment."
+}

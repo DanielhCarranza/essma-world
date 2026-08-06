@@ -63,7 +63,10 @@ export type WearableDefinition = {
   anchor: { x: number; y: number };
   zIndex: number;
   locale: LocalizedText;
-  unlock: { type: "starter" } | { type: "reward"; activityId: string };
+  unlock:
+    | { type: "starter" }
+    | { type: "reward"; activityId: string }
+    | { type: "pending-art"; reason: "procedural-placeholder" };
   asset: CatalogAsset;
 };
 
@@ -178,11 +181,13 @@ export const characters: readonly CharacterDefinition[] = [
         description: "Exploradora del rancho con rizos oscuros y moño azul.",
       },
     },
+    // Documentation mirrors public/assets/wearables/slot-fit-contract.json.
+    // Runtime still stacks full 1254px canvases; placement is authored into PNGs.
     anchors: {
-      hair: { x: 627, y: 270 },
-      outfit: { x: 627, y: 710 },
-      shoes: { x: 627, y: 1085 },
-      accessory: { x: 770, y: 285 },
+      hair: { x: 623, y: 250 },
+      outfit: { x: 623, y: 465 },
+      shoes: { x: 623, y: 1110 },
+      accessory: { x: 623, y: 240 },
     },
     asset: originalAsset(
       "/assets/characters/v1/essma-base.png",
@@ -202,9 +207,9 @@ export const characters: readonly CharacterDefinition[] = [
       },
     },
     anchors: {
-      head: { x: 627, y: 388 },
-      neck: { x: 627, y: 575 },
-      body: { x: 627, y: 720 },
+      head: { x: 627, y: 275 },
+      neck: { x: 627, y: 545 },
+      body: { x: 627, y: 470 },
     },
     asset: originalAsset(
       "/assets/characters/v1/juancito-base.png",
@@ -221,9 +226,9 @@ export const characters: readonly CharacterDefinition[] = [
       "es-MX": { name: "Tori", description: "Cacomixtle curioso del rancho." },
     },
     anchors: {
-      head: { x: 627, y: 360 },
-      neck: { x: 627, y: 560 },
-      body: { x: 627, y: 735 },
+      head: { x: 628, y: 245 },
+      neck: { x: 628, y: 530 },
+      body: { x: 628, y: 540 },
     },
     asset: originalAsset(
       "/assets/characters/v1/tori-base.png",
@@ -240,9 +245,9 @@ export const characters: readonly CharacterDefinition[] = [
       "es-MX": { name: "Anita", description: "Vaquita amable del rancho." },
     },
     anchors: {
-      head: { x: 627, y: 390 },
-      neck: { x: 627, y: 560 },
-      body: { x: 627, y: 760 },
+      head: { x: 625, y: 270 },
+      neck: { x: 625, y: 540 },
+      body: { x: 625, y: 455 },
     },
     asset: originalAsset(
       "/assets/characters/v1/anita-base.png",
@@ -271,7 +276,7 @@ function wearable(
   description: string,
   zIndex: number,
   score: number,
-  assetVersion: 1 | 2 = 1,
+  assetVersion: 1 | 2 | 3 | 4 = 1,
   unlock: WearableDefinition["unlock"] = { type: "starter" },
 ): WearableDefinition {
   const character = characters.find((entry) => entry.id === target);
@@ -332,6 +337,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Botitas para Essma.",
     40,
     91,
+    3,
   ),
   wearable(
     "wearable.essma.diademita-flor",
@@ -350,6 +356,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Gorrito para Juancito.",
     30,
     89,
+    3,
   ),
   wearable(
     "wearable.juancito.chaleco-bolsitas",
@@ -359,6 +366,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Chaleco para Juancito.",
     20,
     92,
+    4,
   ),
   wearable(
     "wearable.tori.panuelo-azul",
@@ -386,6 +394,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Chaleco para Anita.",
     20,
     94,
+    4,
   ),
   wearable(
     "wearable.anita.panuelo-rosa",
@@ -445,6 +454,8 @@ export const wearables: readonly WearableDefinition[] = [
     60,
     95,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.corona-flores",
@@ -455,6 +466,8 @@ export const wearables: readonly WearableDefinition[] = [
     60,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.gorrito-campesino",
@@ -465,6 +478,8 @@ export const wearables: readonly WearableDefinition[] = [
     60,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.tunica-clasica",
@@ -475,6 +490,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     96,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.overol-mezclilla",
@@ -485,6 +502,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.vestido-festivo",
@@ -495,6 +514,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     94,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.huaraches-piel",
@@ -505,6 +526,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.tenis-sol",
@@ -515,6 +538,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.zapatitos-rojos",
@@ -525,6 +550,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.panuelo-cobalto",
@@ -535,6 +562,8 @@ export const wearables: readonly WearableDefinition[] = [
     50,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.canastita-flores",
@@ -545,6 +574,8 @@ export const wearables: readonly WearableDefinition[] = [
     50,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.pulserita-cuentas",
@@ -555,6 +586,8 @@ export const wearables: readonly WearableDefinition[] = [
     50,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.panuelo-verde",
@@ -574,7 +607,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Poncho para explorar el rancho.",
     40,
     88,
-    2,
+    4,
   ),
   wearable(
     "wearable.tori.chaleco-camino",
@@ -584,7 +617,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Chaleco naranja para Tori.",
     20,
     91,
-    2,
+    4,
   ),
   wearable(
     "wearable.tori.panuelo-coral",
@@ -594,7 +627,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Pañuelo color coral para Tori.",
     30,
     89,
-    2,
+    3,
   ),
   wearable(
     "wearable.anita.corona-flores",
@@ -614,7 +647,7 @@ export const wearables: readonly WearableDefinition[] = [
     "Chaleco azul suave para Anita.",
     20,
     92,
-    2,
+    4,
   ),
   // JUANCITO WEARABLES
   wearable(
@@ -626,6 +659,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.casquito-explorador",
@@ -636,6 +671,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.corona-cactus",
@@ -646,6 +683,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.gorrito-noche",
@@ -656,6 +695,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.gorrito-semillas",
@@ -677,6 +718,7 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     91,
     2,
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.collar-semillas",
@@ -687,6 +729,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.mono-mariposa",
@@ -697,6 +741,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.bufandita-tejida",
@@ -707,6 +753,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.sarape-sonora",
@@ -717,6 +765,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     95,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.chaleco-cuero",
@@ -727,6 +777,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.juancito.overolcito-trabajo",
@@ -737,6 +789,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     94,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   // TORI WEARABLES
   wearable(
@@ -748,6 +802,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.diadema-estrellita",
@@ -758,6 +814,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.gorrito-tejido",
@@ -768,6 +826,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.viserita-sol",
@@ -778,6 +838,8 @@ export const wearables: readonly WearableDefinition[] = [
     40,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.collar-flores",
@@ -788,6 +850,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     94,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.panuelo-amarillo",
@@ -798,6 +862,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.gargantilla-cuentas",
@@ -808,6 +874,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.ponchito-rayas",
@@ -818,6 +886,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     95,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.chaleco-denim",
@@ -828,6 +898,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.capita-bosque",
@@ -838,6 +910,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.tori.tunicas-flores",
@@ -848,6 +922,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     94,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   // ANITA WEARABLES
   wearable(
@@ -859,6 +935,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     95,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.mono-rosa",
@@ -869,6 +947,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.gorrito-campana",
@@ -879,6 +959,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.diadema-girasol",
@@ -889,6 +971,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.campanilla-dorada",
@@ -899,6 +983,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     94,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.panuelo-marigold",
@@ -909,6 +995,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     91,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.collar-corazon",
@@ -919,6 +1007,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     92,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.panuelo-verde",
@@ -929,6 +1019,8 @@ export const wearables: readonly WearableDefinition[] = [
     30,
     90,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.mantita-tejida",
@@ -939,6 +1031,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     95,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.overol-granja",
@@ -949,6 +1043,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     93,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.anita.falda-floreada",
@@ -959,6 +1055,8 @@ export const wearables: readonly WearableDefinition[] = [
     20,
     94,
     2,
+
+    { type: "pending-art", reason: "procedural-placeholder" },
   ),
   wearable(
     "wearable.essma.sombrero-jardinero",
@@ -1352,6 +1450,11 @@ export const cameos: readonly CameoDefinition[] = [
     ),
   },
 ] as const;
+
+/** Wearables withheld from the playable closet until real cutouts replace procedural placeholders. */
+export const pendingArtWearableIds = wearables
+  .filter((item) => item.unlock.type === "pending-art")
+  .map((item) => item.id);
 
 export const starterWearableIds = wearables
   .filter((item) => item.unlock.type === "starter")

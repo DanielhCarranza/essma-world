@@ -6,10 +6,10 @@ Extend the committed **Playable Core** into the **Cozy Ranch Expansion** (Phase 
 
 Read the production package first:
 
-1. [`outputs/essma-world-production-docs/README.md`](../outputs/essma-world-production-docs/README.md)
-2. [`Roadmap.md`](../outputs/essma-world-production-docs/Roadmap.md) — Phase 2 tasks are fully specified here
-3. [`ARCHITECTURE.md`](../outputs/essma-world-production-docs/ARCHITECTURE.md)
-4. [`ASSET-BIBLE.md`](../outputs/essma-world-production-docs/ASSET-BIBLE.md)
+1. [`docs/production/README.md`](production/README.md)
+2. [`Roadmap.md`](production/Roadmap.md) — Phase 2 tasks are fully specified here
+3. [`ARCHITECTURE.md`](production/ARCHITECTURE.md)
+4. [`ASSET-BIBLE.md`](production/ASSET-BIBLE.md)
 5. [`docs/reference-images/README.md`](reference-images/README.md) and the five supplied images.
 
 ---

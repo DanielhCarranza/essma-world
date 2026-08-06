@@ -2,7 +2,7 @@
 
 This is the repeatable production process for every new Essma World visual asset. It is model-agnostic: use GPT Image, Gemini / Nano Banana, Grok Imagine, or another generator that can produce the required source image. A generated image is not production-ready until it passes the processing, catalog, and in-game checks below.
 
-Read this together with [the Asset Bible](../outputs/essma-world-production-docs/ASSET-BIBLE.md), [asset QA](ASSET-QA.md), and the [reference-image policy](reference-images/README.md).
+Read this together with [the Asset Bible](production/ASSET-BIBLE.md), [asset QA](ASSET-QA.md), and the [reference-image policy](reference-images/README.md).
 
 ## Non-negotiables
 

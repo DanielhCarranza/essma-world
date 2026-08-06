@@ -1,6 +1,6 @@
 # Essma World — Production Documents
 
-This package is the source of truth for pre-production of **Essma World**, a Spanish-first, child-safe cozy ranch and dress-up web game.
+This package is the source of truth for pre-production of **Essma World**, a Spanish-first, child-safe cozy ranch and dress-up web game. It lives under `docs/production/` (not a generated `outputs/` dump).
 
 ## Read in this order
 

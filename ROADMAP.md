@@ -49,7 +49,7 @@ not replace it with parallel systems.
 
 Current non-negotiable documents are [AGENTS.md](AGENTS.md),
 [NEXT-AGENT-HANDOFF.md](docs/NEXT-AGENT-HANDOFF.md), and the production
-package in `outputs/essma-world-production-docs/`. The supplied reference
+package in `docs/production/`. The supplied reference
 images are direction only and must never become runtime art.
 
 ## Release sequencing
@@ -386,10 +386,10 @@ Work in this order; finish P0 gates before expanding P2 scope.
 
 ## References
 
-- [Product requirements](outputs/essma-world-production-docs/PRD.md)
-- [Game design](outputs/essma-world-production-docs/GDD.md)
-- [Architecture](outputs/essma-world-production-docs/ARCHITECTURE.md)
-- [Asset Bible](outputs/essma-world-production-docs/ASSET-BIBLE.md)
-- [Test plan](outputs/essma-world-production-docs/TEST-PLAN.md)
-- [Content and safety](outputs/essma-world-production-docs/CONTENT-AND-SAFETY.md)
+- [Product requirements](docs/production/PRD.md)
+- [Game design](docs/production/GDD.md)
+- [Architecture](docs/production/ARCHITECTURE.md)
+- [Asset Bible](docs/production/ASSET-BIBLE.md)
+- [Test plan](docs/production/TEST-PLAN.md)
+- [Content and safety](docs/production/CONTENT-AND-SAFETY.md)
 - [Current asset QA status](docs/ASSET-QA.md)

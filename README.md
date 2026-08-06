@@ -34,7 +34,7 @@ The game is being built as a child-safe creative world for one player aged 5–1
 | ----------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Continue implementation             | [`docs/NEXT-AGENT-HANDOFF.md`](docs/NEXT-AGENT-HANDOFF.md)                                       |
 | Repository rules for agents         | [`AGENTS.md`](AGENTS.md)                                                                         |
-| Product and design documents        | [`outputs/essma-world-production-docs/README.md`](outputs/essma-world-production-docs/README.md) |
+| Product and design documents        | [`docs/production/README.md`](docs/production/README.md) |
 | Visual gold-standard reference pack | [`docs/reference-images/README.md`](docs/reference-images/README.md)                             |
 | Active continuation task            | [GitHub Issue #1](https://github.com/DanielhCarranza/essma-world/issues/1)                       |
 
@@ -56,7 +56,7 @@ The current core uses React for the world map, accessible menus, dress-up, decor
 
 The five reference images in `docs/reference-images/` are the project’s visual gold standard for warmth, materials, character identity, game ambition, and Spanish-first UI feel. They are **inspiration only**: do not use them as runtime assets or copy their artwork, text, layouts, brand marks, age ratings, or logos.
 
-New production assets must be original, have a stable catalog ID and provenance record, work at game scale, and pass the visual-quality gate described in the [Asset Bible](outputs/essma-world-production-docs/ASSET-BIBLE.md).
+New production assets must be original, have a stable catalog ID and provenance record, work at game scale, and pass the visual-quality gate described in the [Asset Bible](docs/production/ASSET-BIBLE.md).
 
 ## Roadmap
 
@@ -65,7 +65,7 @@ New production assets must be original, have a stable catalog ID and provenance 
 3. **World Expansion:** unlock a second region, then add pueblo/oasis stories, festivals, collectibles, and companions.
 4. **Future modules:** Essma Bros integration, isolated 3D mini-games, seasonal content, and an evaluated parent-controlled cloud-backup option.
 
-The detailed milestones and acceptance gates live in [Roadmap.md](outputs/essma-world-production-docs/Roadmap.md).
+The detailed milestones and acceptance gates live in [Roadmap.md](docs/production/Roadmap.md).
 
 ## Contributing
 

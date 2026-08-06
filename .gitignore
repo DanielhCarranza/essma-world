@@ -41,5 +41,7 @@ yarn-error.log*
 next-env.d.ts
 /dist/
 /.wrangler/
+
+# Local scratch / generated dumps (not the docs/production package)
 /outputs/
 /work/

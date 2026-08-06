@@ -1,0 +1,133 @@
+{
+  "$schemaNote": "Canonical wearable placement on the shared 1254px character canvas. Runtime stacks full canvases 1:1 with the base \u2014 fit is authored here via scripts/fit_wearable.py, not CSS or per-item code offsets. attach modes: sit-on (hats), hang-from (scarves), cover-from (outfits/vests), stand-on (shoes). Canvas-authored Essma keepers are preserved and are the visual gold standard for their slots.",
+  "canvas": 1254,
+  "designCenterX": 627,
+  "maxEnlarge": 2.1,
+  "characters": {
+    "essma": {
+      "hair": {
+        "centerX": 623,
+        "attach": "sit-on",
+        "attachY": 250,
+        "sitInset": 40,
+        "maxWidth": 400,
+        "maxHeight": 360,
+        "notes": "Hair mass / side braid; side bias preserved"
+      },
+      "accessory": {
+        "centerX": 623,
+        "attach": "sit-on",
+        "attachY": 240,
+        "sitInset": 30,
+        "maxWidth": 360,
+        "maxHeight": 200,
+        "notes": "Headbands and hats",
+        "lower": {
+          "centerX": 760,
+          "attach": "cover-from",
+          "attachY": 640,
+          "maxWidth": 240,
+          "maxHeight": 260,
+          "notes": "Hip bags / held props"
+        }
+      },
+      "outfit": {
+        "centerX": 623,
+        "attach": "cover-from",
+        "attachY": 465,
+        "maxWidth": 520,
+        "maxHeight": 600,
+        "notes": "Match canvas-authored vestido/conjunto top (~465)"
+      },
+      "shoes": {
+        "centerX": 623,
+        "attach": "stand-on",
+        "groundY": 1110,
+        "maxWidth": 310,
+        "maxHeight": 230,
+        "notes": "Wide duck-footed covering cutouts; soles on ground (calibrated 2026-08-06)"
+      }
+    },
+    "juancito": {
+      "head": {
+        "centerX": 627,
+        "attach": "sit-on",
+        "attachY": 275,
+        "sitInset": 45,
+        "maxWidth": 460,
+        "maxHeight": 260,
+        "notes": "Crown between ears; brim above eyes (calibrated 2026-08-06)"
+      },
+      "neck": {
+        "centerX": 627,
+        "attach": "hang-from",
+        "attachY": 545,
+        "maxWidth": 280,
+        "maxHeight": 160,
+        "notes": "Bandana under chin / upper chest"
+      },
+      "body": {
+        "centerX": 627,
+        "attach": "cover-from",
+        "attachY": 470,
+        "maxWidth": 430,
+        "maxHeight": 380,
+        "notes": "Under chin / on shoulders of pear torso (browser 2026-08-06)"
+      }
+    },
+    "tori": {
+      "head": {
+        "centerX": 628,
+        "attach": "sit-on",
+        "attachY": 245,
+        "sitInset": 28,
+        "maxWidth": 260,
+        "maxHeight": 150,
+        "notes": "Face-centered (ignore tail)"
+      },
+      "neck": {
+        "centerX": 628,
+        "attach": "hang-from",
+        "attachY": 530,
+        "maxWidth": 280,
+        "maxHeight": 180,
+        "notes": "Below snout on upper chest, face-centered X (calibrated 2026-08-06)"
+      },
+      "body": {
+        "centerX": 628,
+        "attach": "cover-from",
+        "attachY": 540,
+        "maxWidth": 300,
+        "maxHeight": 270,
+        "notes": "Below snout on chest, face-centered X (browser 2026-08-06)"
+      }
+    },
+    "anita": {
+      "head": {
+        "centerX": 625,
+        "attach": "sit-on",
+        "attachY": 270,
+        "sitInset": 25,
+        "maxWidth": 340,
+        "maxHeight": 170,
+        "notes": "Between ears / on poll"
+      },
+      "neck": {
+        "centerX": 625,
+        "attach": "hang-from",
+        "attachY": 540,
+        "maxWidth": 250,
+        "maxHeight": 140,
+        "notes": "Neckerchief under jaw"
+      },
+      "body": {
+        "centerX": 625,
+        "attach": "cover-from",
+        "attachY": 455,
+        "maxWidth": 290,
+        "maxHeight": 320,
+        "notes": "Under jaw, narrow calf chest (browser 2026-08-06)"
+      }
+    }
+  }
+}

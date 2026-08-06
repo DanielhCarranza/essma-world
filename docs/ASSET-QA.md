@@ -18,18 +18,81 @@ readiness, and absence of text, logos, copied poses, or branded elements.
 | Anita base                               | 91/100    | Pending final product approval                                                                                                                                    |
 | Essma base                               | 88/100    | Approved release candidate: dark curls, blue bow, light complexion, young child identity with non-obtrusive neutral base |
 | Original world map, landscape + portrait | 89–92/100 | Pending final product approval                                                                                                                                    |
-| ~65 wearable layers (v1 + v2 expanded closet) | 87–94/100 (v1 baseline); v2 expanded closet pending full game-scale visual QA | Pending final product approval; v2 expanded closet still needs in-game anchor/alpha pass at ranch and dress-up scale |
+| Playable closet keepers (20 starter + 2 reward) | Mixed — see Foundations pass below | Pending final product approval |
+| ~45 procedural v2 placeholders | Hard-fail (tiny Pillow ellipses, not cutouts) | Withheld from play (`unlock.type: pending-art`); tracked for regen |
 | Ten patio decoration layers              | 88–92/100 | Pending final product approval                                                                                                                                    |
 | Three cameo portraits                    | 88/100    | Pending final product approval                                                                                                                                    |
 
-The v1 wearable pass included crop-and-place correction so every item shares
-its target character’s 1254px layer canvas. The v2 expanded closet (~65 items,
-5+ per slot across Essma, Juancito, Tori, and Anita) still needs a full
-game-scale visual QA pass at ranch and dress-up scale; `productApproved` remains
-false and `culturalReview` remains `"not-performed"`. Runtime and thumbnail
-files were checked for dimensions and alpha transparency where present. The
-decor pack uses 768px transparent runtime canvases and 256px thumbnails; the
-map has separately authored landscape and portrait files.
+### Foundations pass (2026-08-05)
+
+Playable closet is gated to quality keepers only (all v1 + non-tiny AI v2 cutouts).
+Procedural placeholders (~45 files under 15KB from Pillow filler scripts) use
+`unlock.type: "pending-art"` and are stripped from profile unlocks on migrate.
+
+### Slot-fit system pass (2026-08-06)
+
+**RCA:** Runtime never applied catalog anchors. Fit is 100% baked into 1254px
+canvases. Many keepers were placed with ad-hoc / wrong boxes (and Tori face vs
+tail center was ignored), so hats floated, vests sat on bellies, and scarves
+covered snouts. Per-item CSS offsets would not scale.
+
+**Durable fix:** [`public/assets/wearables/slot-fit-contract.json`](../public/assets/wearables/slot-fit-contract.json)
++ [`scripts/fit_wearable.py`](../scripts/fit_wearable.py) +
+[`scripts/verify-wearable-fit.py`](../scripts/verify-wearable-fit.py).
+Future wearables: isolated cutout → `fit_wearable.py --character --slot` →
+`verify-wearable-fit.py`. Canvas-authored Essma outfits/hair/bags are
+`preserve` (gold standard); animals + shoes re-fit through the contract.
+
+| Keeper group | Fit result | Notes |
+| --- | --- | --- |
+| Essma outfits / hair / diademita / sombrero / bolsita | Pass (preserved) | Original canvas alignment kept |
+| Animal head / neck / body keepers | Pass (contract) | Re-fit via attach modes; verify script 22/22 OK |
+| Essma shoes (`botitas-cobalto`) | Fail hard (art) | Still needs covering cutout regen (issue #4) |
+
+### Fit calibration subset (2026-08-06)
+
+Proved the durable pipeline on four worst-failure slots with **v1-quality** regen +
+contract fit into `public/assets/wearables/v3/`. Catalog IDs unchanged; paths bump to v3.
+
+| ID | Slot | Result | Evidence |
+| --- | --- | --- | --- |
+| `wearable.juancito.gorrito-aventurero` | head | **Pass** | Hat on crown, eyes clear |
+| `wearable.juancito.chaleco-bolsitas` | body | **Pass** | Vest on shoulders / torso |
+| `wearable.tori.panuelo-coral` | neck | **Pass** | Under snout, face-centered X |
+| `wearable.essma.botitas-camino` | shoes | **Pass** | Covering dual-boot cutout; ~98% foot-pixel cover |
+
+**Mechanical:** `python3 scripts/verify-wearable-fit.py` → 0 failures.
+
+**Visual (required):**
+- Dress-up screenshots: `docs/asset-qa-calibration/screenshots/02-dress-juancito-hat-vest.png`, `04-dress-tori-coral.png`, `06-dress-essma-boots.png` (+ `*b-*-preview.png` crops).
+- Contact overlays: `docs/asset-qa-calibration/{juancito,tori,essma}-look.png`.
+- Ranch at game scale: `docs/asset-qa-calibration/screenshots/ranch-scale-{juancito,tori,essma}.png` (composites on ranch art). Headless Chromium cannot boot Phaser (`scene-load-error`); live ranch must still be spot-checked in a real browser before product approval.
+
+**Contract locks** (do not blanket `--refit-keepers --force` on preserved Essma outfits):
+`juancito.head`, `juancito.body`, `tori.neck`, `tori.body`, `anita.body`, `essma.shoes` in
+[`slot-fit-contract.json`](../public/assets/wearables/slot-fit-contract.json).
+
+### Animal body / vest pass (2026-08-06, browser follow-up)
+
+Live dress UI showed animal vests still wrong after attachY-only re-fit (humanoid vest silhouettes on animal anatomy). **RCA:** runtime 1:1 stack is fine; humanoid armhole cutouts cannot look worn on pear/calf/cacomixtle bodies.
+
+### Animal body worn extraction (2026-08-06) — v4
+
+Replaced animal **body** keepers with canvas-authored layers extracted from “character wearing garment” generations (species-shaped wraps), shipped under `public/assets/wearables/v4/`, marked `preserve` in `KEEPER_SPECS`.
+
+| ID | Result | Notes |
+| --- | --- | --- |
+| `juancito.chaleco-bolsitas` | **Pass (placement)** | Torso wrap under chin; not belly/face |
+| `juancito.poncho-cobalto` | **Pass (placement)** | Chest wrap; blue hue extract |
+| `tori.chaleco-camino` | **Pass (placement)** | Below snout; face clear |
+| `anita.chaleco-margarita` | **Pass (placement)** | Chest panel under scarf |
+| `anita.chaleco-cielo` | **Pass (placement)** | Narrower chest wrap |
+
+**Browser evidence:** `docs/asset-qa-calibration/worn-body/browser/*-preview.png` (v4 URLs confirmed loading). Overlays: `docs/asset-qa-calibration/worn-body/*-overlay.png`.
+
+**Honest limits (2026-08-06 follow-up):** v4 improved **placement** vs belly/face stickers, but most animal body items still fail a strict **worn** bar (flat panels, weak wrap, paws not clearly through garments). Root cause is full-body base + single overlay — not Phaser. **Next art slice:** paper-doll (torso-under / paws-over), documented in [`ASSET-GENERATION.md`](ASSET-GENERATION.md) and [`DESTINATIONS.md`](DESTINATIONS.md); tracked on [`ROADMAP.md`](../ROADMAP.md) P0.2 / P2. Do not treat engine migration as the fix. `productApproved` remains false.
+
+`culturalReview` remains `"not-performed"`. Remaining pending-art closet + `botitas-cobalto` still on [issue #4](https://github.com/DanielhCarranza/essma-world/issues/4).
 
 ## Provenance and processing
 

@@ -552,6 +552,7 @@ export default function Home() {
                     <button
                       className="decorate-launch"
                       type="button"
+                      onPointerDown={(event) => event.stopPropagation()}
                       onClick={openDecorator}
                     >
                       <span aria-hidden="true">🌼</span>
@@ -560,6 +561,7 @@ export default function Home() {
                     <button
                       className="decorate-launch garden-launch"
                       type="button"
+                      onPointerDown={(event) => event.stopPropagation()}
                       onClick={() => setShowGardenActivity(true)}
                     >
                       <span aria-hidden="true">🌱</span>
@@ -568,6 +570,7 @@ export default function Home() {
                     <button
                       className="decorate-launch care-launch"
                       type="button"
+                      onPointerDown={(event) => event.stopPropagation()}
                       onClick={() => setShowCareActivity(true)}
                     >
                       <span aria-hidden="true">🐾</span>
@@ -612,6 +615,7 @@ export default function Home() {
             {screen === "dress" && (
               <section className="dress-room" aria-label="Vestir">
                 <DressUpPanel
+                  key={selected}
                   characterId={selected}
                   appearance={profile.appearance}
                   unlockedItemIds={profile.unlocks.itemIds}
@@ -839,7 +843,12 @@ export default function Home() {
                   {profile.unlocks.decorIds.length} decoraciones.
                 </p>
                 <ul className="collection-list">
-                  {[...wearables, ...ranchDecor].map((item) => (
+                  {[
+                    ...wearables.filter(
+                      (item) => item.unlock.type !== "pending-art",
+                    ),
+                    ...ranchDecor,
+                  ].map((item) => (
                     <li key={item.id}>
                       {profile.unlocks.itemIds.includes(item.id) ||
                       profile.unlocks.decorIds.includes(item.id)

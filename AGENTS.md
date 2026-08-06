@@ -2,11 +2,12 @@
 
 ## Mission and current slice
 
-Build **Essma World** as a warm, original, Mexican-Spanish-first 2D web game
-for one young child. The current playable core is: **world map → Rancho de
-Essma → dress a friend → decorate the patio → save locally**. The player should
-be able to understand the next action mostly from pictures, placement, and
-short labels—not paragraphs of text.
+Build **Essma World** as a warm, original, Mexican-Spanish-first web game for
+one young child: a **2D hub** (world map → Rancho → dress friends → decorate →
+save locally) plus later **isolated destinations** (platformer, climb, kart).
+The player should understand the next action mostly from pictures, placement,
+and short labels—not paragraphs of text. See
+[`docs/DESTINATIONS.md`](docs/DESTINATIONS.md) and [`ROADMAP.md`](ROADMAP.md).
 
 Work on `codex/issue-1-phaser-ranch` for GitHub Issue #1 unless the user
 explicitly asks to change scope or branch. Keep commits local until asked to
@@ -16,11 +17,11 @@ create.
 ## Read before changing a system
 
 1. `docs/NEXT-AGENT-HANDOFF.md` — current state and the next coherent slice.
-2. `outputs/essma-world-production-docs/README.md` — production-document
-   index, then the relevant PRD, GDD, Architecture, Asset Bible, Safety,
-   Roadmap, and Test Plan.
-3. `docs/reference-images/README.md` and its five images — art direction only.
-4. `docs/ASSET-QA.md` and the generated pack manifests before touching art.
+2. `ROADMAP.md` and `docs/DESTINATIONS.md` — hub vs destinations, sequencing.
+3. `outputs/essma-world-production-docs/README.md` or `docs/production/` —
+   when present: PRD, GDD, Architecture, Asset Bible, Safety, Test Plan.
+4. `docs/reference-images/README.md` and its five images — art direction only.
+5. `docs/ASSET-QA.md` and the generated pack manifests before touching art.
 
 When product docs, a past handoff, and implementation disagree, use the latest
 documented canonical decision; raise a conflict rather than silently changing
@@ -35,10 +36,11 @@ the game promise.
 - `app/lib/game-catalog.ts` — versioned authored catalog; never player state.
 - `app/lib/player-profile.ts` / `app/lib/profile-store.ts` — validated
   IndexedDB profile, migrations, import/export.
-- `app/mini-game.ts` — framework-neutral future mini-game result boundary.
+- `app/mini-game.ts` — framework-neutral mini-game / destination result boundary.
 - `public/assets/**/v*/` — versioned runtime assets and thumbnails.
+- `ROADMAP.md`, `docs/DESTINATIONS.md` — hub vs destinations sequencing.
 - `docs/reference-images/` — private inspiration, never runtime content.
-- `outputs/essma-world-production-docs/` — checked-in product source of truth.
+- `outputs/essma-world-production-docs/` / `docs/production/` — product docs when present.
 - `tests/` — rendered-page, catalog/profile, and mini-game contract coverage.
 
 ## Architecture boundaries
@@ -51,6 +53,10 @@ the game promise.
   boundary instead of recreating it for a selection or setting change.
 - Semantic React controls must mirror important Phaser actions for keyboard,
   screen-reader, mouse, and touch use. Canvas code must not write profiles.
+- **Hub vs destinations:** ranch/dress-up stay React + Phaser 2D. Future
+  Essma Bros / Kong / Kart (and any Three.js) are **destination modules**
+  only — never a reason to rebuild the closet in 3D. Contract:
+  [`docs/DESTINATIONS.md`](docs/DESTINATIONS.md).
 - **Three.js is not a ranch dependency.** If needed later, lazy-load it in an
   isolated module implementing `MiniGameModule`; give it separate assets and a
   performance budget. It receives read-only context and returns a result only.
@@ -111,6 +117,16 @@ the game promise.
   appearance. The release-candidate gate is **85/100 with no hard fail**.
   Record findings in `docs/ASSET-QA.md`; do not claim an external cultural
   review that was not performed.
+- **Wearables:** follow [`docs/ASSET-GENERATION.md`](docs/ASSET-GENERATION.md)
+  “Wearable pipeline”. Runtime stacks full 1254×1254 layers 1:1 — fit is
+  authored via [`slot-fit-contract.json`](public/assets/wearables/slot-fit-contract.json)
+  + `scripts/fit_wearable.py`, not CSS/Phaser offsets. Quality bar = v1 keepers;
+  ban Pillow filler scripts. Mechanical `verify-wearable-fit.py` **plus**
+  dress/ranch screenshots visually read before claiming pass. **Worn clothes**
+  need paper-doll occlusion (Essma hands-over; animals torso-under / paws-over).
+  Animal body garments must be species-shaped (`preserve`), never humanoid
+  vest cutouts nudged by attachY. Worn-extraction is a bootstrap, not the
+  final worn bar.
 
 ## Visual and interaction quality
 

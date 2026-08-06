@@ -835,10 +835,8 @@ button:active:not(:disabled) {
   position: relative;
 }
 .decorate-launch {
-  position: absolute;
-  z-index: 18;
-  right: clamp(18px, 3vw, 38px);
-  bottom: 152px;
+  position: relative;
+  z-index: 1;
   min-width: 118px;
   min-height: 54px;
   display: flex;
@@ -907,38 +905,20 @@ button:active:not(:disabled) {
   inset: 0;
   z-index: 0;
 }
+/* Friend/cameo/zone controls stay in the DOM for keyboard and screen readers,
+   but the visible pill bar is gone — canvas + Decorar/dress UI cover the same jobs. */
 .scene-accessibility {
-  position: absolute;
-  z-index: 3;
-  left: 50%;
-  bottom: 12px;
-  transform: translateX(-50%);
-  width: min(980px, calc(100% - 24px));
-  height: auto;
-  overflow: visible;
-  clip: auto;
-  white-space: normal;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-.scene-accessibility p {
   position: absolute;
   width: 1px;
   height: 1px;
+  margin: -1px;
+  padding: 0;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  z-index: -1;
 }
-.scene-accessibility button {
-  border: 2px solid #fff0cf;
-  border-radius: 999px;
-  background: #75412be8;
-  color: #fff9e9;
-  font-weight: 850;
-  padding: 7px 10px;
-}
-.scene-accessibility button:focus-visible,
 .quick-actions button:focus-visible,
 button:focus-visible {
   outline: 3px solid #1c6598;
@@ -1060,7 +1040,7 @@ button:focus-visible {
   position: absolute;
   z-index: 20;
   left: clamp(16px, 5vw, 74px);
-  bottom: 96px;
+  bottom: 24px;
   width: min(395px, calc(100% - 32px));
   padding: 15px;
   color: #fff8e8;
@@ -1164,32 +1144,6 @@ button:focus-visible {
     height: 210px;
     margin-bottom: 30px;
   }
-  .scene-accessibility {
-    z-index: 14;
-    left: 0;
-    bottom: 57px;
-    transform: none;
-    width: 100%;
-    padding: 8px 10px;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    background: linear-gradient(90deg, #75412bf2, #5d3327f2);
-    scrollbar-width: thin;
-  }
-  .scene-accessibility p {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-  .scene-accessibility button {
-    flex: 0 0 auto;
-    font-size: 11px;
-    padding: 7px 10px;
-  }
   .quick-actions {
     gap: 6px;
   }
@@ -1200,7 +1154,7 @@ button:focus-visible {
 @media (max-width: 760px) {
   .first-play-guide {
     left: 12px;
-    bottom: 129px;
+    bottom: 88px;
     padding: 12px;
   }
   .first-play-guide strong {
@@ -1210,54 +1164,7 @@ button:focus-visible {
     font-size: 12px;
     margin-bottom: 9px;
   }
-}
-
-/* The ranch controls remain visible: early readers can use the same short
-   labels with touch, mouse, or keyboard. */
-.quick-actions small {
-  font-size: 11px;
-}
-.scene-accessibility {
-  z-index: 15;
-  left: 50%;
-  bottom: 78px;
-  transform: translateX(-50%);
-  width: min(720px, calc(100% - 24px));
-  height: auto;
-  min-height: 44px;
-  overflow: visible;
-  clip: auto;
-  white-space: normal;
-  padding: 7px;
-  border: 2px solid #fff0cf;
-  border-radius: 15px;
-  background: #75412bd9;
-  box-shadow: 0 4px 0 #4e2b22;
-}
-.scene-accessibility:focus-within {
-  background: #75412bf5;
-}
-@media (max-width: 760px) {
-  .scene-accessibility {
-    left: 12px;
-    bottom: 63px;
-    transform: none;
-    width: calc(100% - 24px);
-    max-height: 112px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-  }
-  .scene-accessibility p {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
   .decorate-launch {
-    right: 12px;
-    bottom: 138px;
     min-width: 106px;
     min-height: 48px;
   }
@@ -1266,12 +1173,16 @@ button:focus-visible {
   }
 }
 
+.quick-actions small {
+  font-size: 11px;
+}
+
 /* Garden Activity & Action Bar */
 .ranch-action-bar {
   position: absolute;
   right: 18px;
-  bottom: 154px;
-  z-index: 10;
+  bottom: 24px;
+  z-index: 16;
   display: flex;
   flex-direction: column;
   gap: 8px;

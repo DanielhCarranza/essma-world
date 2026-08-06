@@ -43,3 +43,7 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Wearable fit script backups / local candidate work
+.fit-backups/
+.fit-work/

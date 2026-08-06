@@ -58,7 +58,7 @@ Create one written spec before sending a prompt:
 | Target / slot | essma / hair |
 | Play use | visible at ranch and dress-up scale; brim must not cover eyes |
 | Render contract | native transparent or chroma source; 1254px final canvas |
-| Layer contract | z-index, anchor, approved placement box |
+| Layer contract | z-index; slot-fit box in slot-fit-contract.json (anchors are docs only) |
 | Accessibility | Spanish name, concise description, meaningful alt |
 | Source notes | model/version, final prompt, inputs, terms/license review |
 | QA | draft; no pre-marked product or cultural approval |
@@ -160,23 +160,184 @@ Use this only after checking its actual alpha channel. Inspect on light and dark
 
 Ask for one flat saturated key color (the v2 packs used solid green) with no similar color inside the subject. Keep the subject away from edges and avoid gradients, floors, and contact shadows. Remove the key locally, preserve soft antialiasing, despill the edge, and inspect at 100%. A checkerboard screenshot is not proof of valid alpha.
 
-## Processing pipeline
+## Wearable pipeline (canonical — proven 2026-08-06)
 
-The current v2 wearables and v1 decor followed this sequence:
+This is the only production path for new or replacement wearables. Decor still
+follows the shorter sequence under “Decor / other packs” below.
+
+### 1. Runtime contract
+
+- Dress-up and Phaser stack full **1254×1254** transparent layers **1:1** with
+  the character base. There are **no** per-item React/CSS/Phaser position offsets.
+- Catalog `anchors` document attach points for humans and tools; they do **not**
+  drive runtime placement. Fit is authored into the PNG via the slot-fit contract.
+- Do **not** invent per-item offset tables in app code.
+
+### 2. Slot-fit contract
+
+Source of truth: [`public/assets/wearables/slot-fit-contract.json`](../public/assets/wearables/slot-fit-contract.json)
++ [`scripts/fit_wearable.py`](../scripts/fit_wearable.py).
+
+Attach modes:
+
+| Mode | Use |
+| --- | --- |
+| `sit-on` | Hats / headwear (attachY + sitInset) |
+| `hang-from` | Scarves / neckerchiefs (top at attachY) |
+| `cover-from` | Outfits / vests (top at attachY) |
+| `stand-on` | Shoes (soles on groundY) |
+
+- **Tori** (and similarly tailed characters): use **face-centered** `centerX`
+  (ignore the tail when centering neck/head).
+- Essma hip bags / held props: accessory **`lower`** sub-box.
+- Canvas-authored Essma keepers (e.g. `vestido-girasol`) are `preserve` in
+  `KEEPER_SPECS` — gold standard; do not blanket `--refit-keepers --force` on them.
+- Tune the **slot box** when a whole character×slot family sits wrong; regenerate
+  art only when silhouette/quality fails.
+
+### 3. Re-fit vs regenerate
+
+| Situation | Action |
+| --- | --- |
+| Silhouette/type is right but misplaced | **Re-fit** with `fit_wearable.py` (maybe tune contract) |
+| Wrong type for the slot (floating front-boots, vest baked with a body, hat that can’t crown) | **Regenerate** isolated cutout, then fit |
+| Shoes | Must be **covering dual-boot** cutouts matching stance; props that leave painted toes visible hard-fail |
+| **Animal body / outfit** | Humanoid vest cutouts are a **hard-fail**. Do not “fix” with attachY or by moving to 3D. Prefer **paper-doll** (below). Worn-extraction alone may improve placement but still fail the worn bar — reject stickers in browser. |
+
+### Paper-doll authoring (canonical for “worn” clothes)
+
+Dress-up games that look fitted use **occlusion**, not engine magic. Runtime
+still stacks 1254×1254 PNGs 1:1 (React preview + Phaser). Structure the
+character like Essma’s hands overlay:
+
+| Layer order (low → high z) | Role |
+| --- | --- |
+| Optional hair-behind / back props | Under body |
+| **Torso / body base** (no forepaws, or paws masked) | Clothes sit on this |
+| Body / outfit / neck wearables | Species-shaped wraps with limb openings |
+| **Paws / forelimbs overlay** (and head-over if needed) | Arms/paws read *through* clothes |
+| Hats / some accessories | Sit on crown; face clear |
+
+**Essma gold path:** canvas-authored outfit + `wearable.essma.hands-overlay`
+(`app/lib/appearance.ts`). **Animals next:** same idea — do not leave a single
+full-body base under a flat vest sticker.
+
+Checklist per animal (Juancito, Tori, Anita):
+
+1. Split or regenerate **torso base** + **paws (forelimb) overlay** at 1254,
+   same pose/light as today’s base; version under `public/assets/characters/vN/`.
+2. Author each body garment as a **species wrap** (pear / ringtail / calf), with
+   intentional openings where paws emerge; matching shading to body volume.
+3. Wire layer order in appearance resolution (paws z above body slot); keep
+   catalog IDs stable where possible.
+4. Hats/scarves may still use slot-fit; body keepers stay `preserve`.
+5. **Browser gate:** limbs through garment, side wrap, no floating rectangle.
+   Placement-only passes are not enough.
+
+Hub stays 2D paper-doll even when destinations later use 3D — see
+[`docs/DESTINATIONS.md`](DESTINATIONS.md).
+
+### Animal body authoring (worn extraction — bootstrap only)
+
+Use when bootstrapping a silhouette before paper-doll parts exist. Essma
+outfits remain canvas-authored gold. Isolated human vest PNGs on full-body
+animal bases will always look like stickers.
+
+1. Generate 2–3 **worn** composites: same character pose as the base, garment conforming to the torso (prompt: “looks worn / wraps body / not a sticker”). Flat `#00FF00` chroma.
+2. Chroma-clean; align worn character bbox to the real base (top + center X).
+3. Extract garment pixels by color delta vs base inside a torso Y-band, inset from body sides so limbs stay readable (no rectangular hole punches).
+4. Export full 1254 transparent layer + thumbnail under a new `vN/`; set catalog `assetVersion`; mark keeper `preserve: true`.
+5. **Browser dress screenshots** — hard refresh, equip item, visually read preview. Reject sticker/face/belly failures. If it still reads as a bib/sticker, escalate to **paper-doll authoring** above — do not keep nudging attachY.
+
+### 4. Quality bar (before any fit time)
+
+Quality bar = **original v1 keepers** (e.g. Essma `vestido-girasol`, Juancito /
+Tori / Anita bases): soft storybook paint, readable silhouette, clean alpha.
+
+- Generate **2–3 candidates** per item; keep the winner. Do not ship the first
+  weak output to “make fit green.”
+- **Pass:** painterly materials, crisp-but-soft edges, correct slot perspective,
+  no text/logos, usable chroma/alpha, game-scale silhouette.
+- **Fail / regen:** flat sticker look, tiny/sparse content, dirty matte,
+  face/body baked into the garment, muddy AI sludge, or anything that lowers
+  the bar vs the first pack.
+- **Banned for production art** (placeholders only, never ship as keepers):
+  `scripts/generate_essma_wearables.py`, `scripts/generate-essma-wearables-native.mjs`,
+  and any Pillow-ellipse filler.
+
+### 5. Commands (one item)
+
+```bash
+# A) GenerateImage (Cursor) or equivalent — isolated object, #00FF00 chroma,
+#    no body/mannequin; style-match v1 keepers. Keep 2–3 candidates.
+
+# B) Quality reject until v1 bar passes (side-by-side with vestido-girasol / base).
+
+# C) Local chroma → alpha (PIL/HSV). Crop opaque bbox. No filler scripts.
+
+# D) Fit into a new versioned path
+python3 scripts/fit_wearable.py SOURCE.png \
+  public/assets/wearables/vN/<target>.<slug>.png \
+  --character juancito --slot head
+# thumbs are written beside the runtime PNG
+
+# E) Mechanical gate
+python3 scripts/verify-wearable-fit.py
+
+# F) Contact overlay (base + item) + dress-up + ranch screenshots
+# G) Read the screenshot image files visually before claiming pass
+# H) Point catalog assetVersion / paths to vN; update ASSET-QA.md
+```
+
+Low-level escape hatch only when numbers already match the contract:
+
+```bash
+python3 scripts/reposition-wearable.py INPUT.png OUTPUT.png \
+  --center-x 627 --top 10 --max-width 410 --max-height 195 --canvas 1254
+```
+
+After changing a slot box for a family (not a one-off art fix):
+
+```bash
+python3 scripts/fit_wearable.py --refit-keepers   # skips preserve
+python3 scripts/verify-wearable-fit.py
+```
+
+### 6. Calibration rule
+
+Calibrate **one gold item per character×slot** (hat / vest / scarf / shoes as
+needed) with overlays + dress screenshots before batching N more for that slot.
+The 2026-08-06 calibration subset locked `juancito.head`, `juancito.body`,
+`tori.neck`, and `essma.shoes` — see [`docs/ASSET-QA.md`](ASSET-QA.md).
+
+### 7. Versioning
+
+- Replacements ship under a new `public/assets/wearables/vN/` directory.
+- Stable catalog IDs stay the same; bump `assetVersion` / paths only.
+- Do not overwrite an accepted PNG in place.
+
+### 8. QA gate (mechanical + screenshots)
+
+Script checks alone are **not** enough:
+
+1. Contact-sheet overlays (base + item).
+2. Dress-up screenshots with the item equipped.
+3. Ranch / game-scale proof (live Phaser when available; note headless gaps).
+4. **Read** the image files and judge fit + quality (eyes clear, hat on crown,
+   vest on shoulders, scarf under snout, boots covering feet, art matches v1).
+5. Record pass/fail + paths in [`docs/ASSET-QA.md`](ASSET-QA.md).
+6. Keep `productApproved: false` and `culturalReview: "not-performed"` until
+   those reviews actually happen.
+
+### Decor / other packs
 
 1. Generate several isolated source candidates from the written brief.
 2. Reject candidates with text, people, external IP, dirty/opaque background, weak silhouette, wrong perspective, or inconsistent child-safe direction.
-3. Remove chroma (or validate native alpha) locally. Record the tool and settings. The prior pack used a local helper with border-key selection, soft matte, and despill.
-4. Crop the non-transparent bounding box, resize without distortion, and composite it into the canonical transparent runtime canvas.
-5. For wearables, use the included helper rather than hand-editing every final canvas:
-
-       python3 scripts/reposition-wearable.py INPUT.png OUTPUT.png \
-         --center-x 627 --top 10 --max-width 410 --max-height 195 --canvas 1254
-
-   The placement values are authored per item after overlaying it on the target base. The script preserves alpha, crops the opaque box, scales proportionally, and composites it into the shared canvas. It does not decide whether the art is correct.
-6. For decor, composite the cleaned prop into a 768px canvas with a sensible ground baseline. The ranch placement-zone anchor, not its raw crop, decides scene location.
-7. Make the 256px thumbnail from the final runtime PNG, not raw generated art.
-8. Check PNG dimensions, alpha, edges, and paths; add manifest and catalog data; then integrate.
+3. Remove chroma (or validate native alpha) locally. Record the tool and settings.
+4. Crop the non-transparent bounding box, resize without distortion, and composite into the canonical transparent runtime canvas (768px for decor).
+5. Ground baseline for decor; ranch placement-zone anchor decides scene location.
+6. Make the 256px thumbnail from the final runtime PNG.
+7. Check dimensions, alpha, edges, paths; add manifest and catalog data; integrate in-game.
 
 Do not overwrite raw sources during processing. Keep them in an access-controlled source location with seed/request ID when available. Public runtime files are approved derivatives only.
 
@@ -223,11 +384,12 @@ Hard-fail and regenerate/rework for generated text, watermark/logo/brand, third-
 ## Batch strategy for the remaining backlog
 
 1. Work by playable slice, not an abstract total count: build each activity's characters, feedback, props, and state before starting another region.
-2. Start every family with a 3–5 item calibration batch. Select a winner, update prompt/placement numbers, then generate the remainder.
+2. **Calibrate one gold item per character×slot** (see wearable §6) before generating the rest of that family. Select a winner, lock contract numbers, then batch.
 3. Batch one family at a time: Essma outfits, animal neckwear, garden decor, and so on. This exposes drift.
 4. Maintain a private contact sheet with source filename, final filename, prompt version, model, QA score, and decision. Retain rejected outputs privately for audit/learning.
 5. When switching models, first run the same calibration brief. Compare at game scale against approved assets and revise palette, camera, edge treatment, and texture constraints before accepting any batch.
 6. Reserve an integration pass for selected thumbnails, missing-file fallback, dark/light background edge tests, mobile crop, reduced-motion, and focus/pressed UI states.
+7. Remaining pending-art closet IDs and leftover shoe cutouts stay on [issue #4](https://github.com/DanielhCarranza/essma-world/issues/4).
 
 ## In-game acceptance checklist
 
@@ -240,10 +402,13 @@ Hard-fail and regenerate/rework for generated text, watermark/logo/brand, third-
 - [ ] Scene art has enough UI/hotspot space; map labels remain DOM, never baked into bitmaps.
 - [ ] Alpha has been inspected on light, dark, and ranch-background colors.
 - [ ] Mouse, touch, and keyboard work without relying on art alone; Spanish labels and alt text exist.
-- [ ] Metadata, QA score, product approval, and cultural-review values are accurate.
+- [ ] `verify-wearable-fit.py` is green **and** dress/ranch screenshots were visually read.
+- [ ] Metadata, QA score, product approval, and cultural-review values are accurate (no fake approvals).
 
 ## Current-pack record
 
-On 2026-08-04, OpenAI built-in image generation produced the original v2 wearable pack, v1 patio-decor pack, and v2 landscape/portrait map pair. Repository references supplied only broad direction and character identity; no reference image ships or runs in the game. Wearables and decor used a solid chroma source, local alpha cleanup, inspection, canonical-canvas placement, and derived thumbnails. Wearables were placed with scripts/reposition-wearable.py on 1254px layers; decor uses 768px transparent runtime canvases; maps were authored separately for landscape and portrait. Complete current prompts/provenance are in the manifests above, and QA scores/pending approval are recorded in docs/ASSET-QA.md.
+On 2026-08-04, OpenAI built-in image generation produced the original v2 wearable pack, v1 patio-decor pack, and v2 landscape/portrait map pair. Repository references supplied only broad direction and character identity; no reference image ships or runs in the game. Wearables and decor used a solid chroma source, local alpha cleanup, inspection, canonical-canvas placement, and derived thumbnails. Early wearables used `reposition-wearable.py`; the durable path is now `fit_wearable.py` + `slot-fit-contract.json`. Decor uses 768px transparent runtime canvases; maps were authored separately for landscape and portrait.
 
-This workflow can be repeated with any suitable generator, but every output is a new candidate until source/terms, metadata, alpha, alignment, QA score, and in-game behavior are reviewed.
+On 2026-08-06, the fit **calibration subset** regenerated and shipped four keepers under `public/assets/wearables/v3/` (Juancito hat/vest, Tori coral scarf, Essma covering boots), locked the matching slot boxes, and verified with dress screenshots + overlays. Process details and QA paths are in this playbook and [`docs/ASSET-QA.md`](ASSET-QA.md).
+
+This workflow can be repeated with any suitable generator, but every output is a new candidate until source/terms, metadata, alpha, alignment, QA score, screenshot review, and in-game behavior are reviewed.

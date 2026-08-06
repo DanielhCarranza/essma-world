@@ -2,56 +2,72 @@
 
 ## Mission
 
-Extend the committed **Playable Core** into the **Cozy Ranch Expansion** (Phase 2). The child-facing game remains Mexican Spanish, single-player, local-only, and free of ads, purchases, accounts, chat, and analytics.
+Keep the **2D hub** (map → ranch → dress → decorate → save) warm and
+child-clear, then grow **isolated destinations** later. Do **not** rebuild
+dress-up/ranch in 3D for Kart/Kong.
 
-Read the production package first:
+Read first:
 
-1. [`outputs/essma-world-production-docs/README.md`](../outputs/essma-world-production-docs/README.md)
-2. [`Roadmap.md`](../outputs/essma-world-production-docs/Roadmap.md) — Phase 2 tasks are fully specified here
-3. [`ARCHITECTURE.md`](../outputs/essma-world-production-docs/ARCHITECTURE.md)
-4. [`ASSET-BIBLE.md`](../outputs/essma-world-production-docs/ASSET-BIBLE.md)
-5. [`docs/reference-images/README.md`](reference-images/README.md) and the five supplied images.
+1. [`ROADMAP.md`](../ROADMAP.md) — P0–P3 sequencing
+2. [`docs/DESTINATIONS.md`](DESTINATIONS.md) — hub vs destinations, Bros → Kong → Kart
+3. [`docs/ASSET-GENERATION.md`](ASSET-GENERATION.md) — wearable + paper-doll pipeline
+4. [`docs/ASSET-QA.md`](ASSET-QA.md) — honest art status
+5. [`docs/reference-images/README.md`](reference-images/README.md) — direction only
+6. Production package when present: `docs/production/` or `outputs/essma-world-production-docs/`
 
 ---
 
-## Current state (as of 2026-08-05)
+## Current state (as of 2026-08-06)
 
 ### What is working
 
 - **World map → Rancho → Dress-up → Patio → Save** loop is fully playable.
-- **65 wearable items** across 4 characters (Essma, Juancito, Tori, Anita), 5+ items per slot.
-- **Dress-up panel**: 100vh layout, centered character preview, friend picker in header, equip/unequip toggle (re-tap), "🚫 Quitar" button, scrollable closet.
-- **Layer rendering**: canonical zIndex hierarchy (shoes:25, outfit/body:30, neck/accessory:35, head/hair:40) applied to all 65 items. ESSMA_HANDS_OVERLAY removed for clean dress rendering.
-- **Garden mini-game**: complete with reward contract and React host validation.
+- **Playable closet = quality keepers only**: 20 starter + 2 reward wearables (v1 originals + solid AI v2 cutouts + **v3 calibration four** + **v4 animal body**). ~45 procedural Pillow placeholders are `unlock.type: "pending-art"` and stripped from profiles.
+- **Dress-up**: equip/unequip toggle + Quitar; **unequip now persists** across save/reload (explicit `""` is not refilled from `DEFAULT_LOOKS`).
+- **Ranch action bar**: Decorar / Jardín / Cuidar stack correctly in flex (absolute stacking bug fixed).
+- **Garden + Care** mini-games with reward contract and React host validation.
 - **IndexedDB save** with caregiver export/import (2-second hold gate).
 - **Settings**: music, SFX, reduced motion honored before any audio or animation starts.
-- Dev server runs via `npx vinext dev --port 3000` (requires `BypassSandbox: true` — the Cloudflare plugin needs port 9229 for debugging, which is blocked in the sandbox).
 
-### Phase 1 gaps still open
+### Architecture decision locked ✅
 
-- ⬜ Visual QA of all 65 wearables at game scale (alpha edges, correct anchors, transparent PNGs)
-- ⬜ Asset provenance records: `productApproved: false` on all v2 wearables — needs a proper product review pass
-- ⬜ Cultural review: `culturalReview: "not-performed"` on all assets — needs a native `es-MX` speaker pass for item names
-- ⬜ Mobile: test dress-up panel + ranch action bar at 390×844 portrait and 844×390 landscape
-- ⬜ First-play guide: make it icon-led, no reading required for a 5-year-old
+- **Hub** = React + Phaser 2D paper-doll. **Destinations** (Essma Bros, Kong, Kart) = isolated `MiniGameModule`s; Three.js only lazy inside a destination.
+- Identity bridge is phased (game-specific art first; hub cosmetics mapped later). See [`DESTINATIONS.md`](DESTINATIONS.md).
+
+### Foundations + fit calibration
+
+- Closet gate + profile migration strip pending-art IDs.
+- Durable unequip + tests.
+- Decorar CSS fix.
+- Essma dress panel remounts on `selected` (`key={selected}`); scene controls expose `data-character-id`.
+- **Overlay vs Phaser input**: ranch chips/action bar no longer double-fire world hits (`input.windowEvents: false` + canvas-target guard). Mouse/touch on **Essma** opens Essma dress, not Juancito.
+- **Slot-fit contract** + `fit_wearable.py` / `verify-wearable-fit.py`.
+- **v3 calibration** (hat/scarf/boots) + **v4 animal body** worn-extraction: placement improved; **worn visual bar still open** for most animal bodies → next slice is paper-doll (torso-under / paws-over), not attachY or 3D.
+- GitHub issue for remaining regen: https://github.com/DanielhCarranza/essma-world/issues/4
+
+### Phase 1 / quality gaps still open
+
+- ⬜ Animal **paper-doll** worn fit (Juancito / Tori / Anita) — ROADMAP P0.2 / P2
+- ⬜ Regen remaining pending-art wearables + `botitas-cobalto` covering cutout ([issue #4](https://github.com/DanielhCarranza/essma-world/issues/4))
+- ⬜ Asset provenance: `productApproved: false` until real product review
+- ⬜ Cultural review: `culturalReview: "not-performed"`
+- ✅ Mobile smoke (390×844): Decorar/Jardín/Cuidar visible non-overlapping; Essma chip opens Essma; unequip shoes persists as `""` after refresh
+- ⬜ First-play guide: icon-led, no reading required for a 5-year-old
+- ⬜ Live-browser ranch spot-check of calibration looks (headless Phaser fails; dress previews already pass)
 
 ---
 
-## Completed this slice — Animal Care Activity ✅
+## Next implementation slices (priority order)
 
-- Ranch action bar **Cuidar** opens `app/care-activity.tsx` (feed Juancito / water Anita / brush Tori; 2 taps each; ¡Gracias!).
-- Rewards via `CARE_REWARD_IDS` + React `applyMiniGameResult`: `wearable.juancito.gorrito-semillas`, `decor.rancho.maceta-corazon`.
-- Garden reward art filled in: `essma.sombrero-jardinero`, `maceta-girasol`.
-- Phaser `celebrateCharacter` prop plays a brief sparkle/pulse (skipped when reduced motion).
+1. **Animal paper-doll worn fit** — torso base + paws overlay; species-shaped body keepers; browser visual gate (`ASSET-GENERATION` “Paper-doll authoring”).
+2. **Mochila** — collection panel for unlocked wearables/decor (exclude `pending-art`).
+3. Remaining P0 usability / CI confidence as needed.
+4. Animal Care polish / brief if still incomplete vs ROADMAP.
+5. **Essma Bros zip inventory** + destination brief — wire as module later; never into ranch Phaser.
+6. Essma Kong, then Essma Kart (lazy 3D only in Kart module) — after hub love and one destination loop.
 
-## Next implementation slice — Collection Feedback ("Mochila")
-
-Highest-priority remaining Phase 2 task (Roadmap 2b):
-
-1. **Mochila** panel listing earned/unlocked wearables and decor with thumbnails.
-2. Keyboard navigable, labeled; no punishing lock icons for a five-year-old.
-3. Caregiver-readable progress without dense text.
-4. Then Photo mode (2c), expanded decor (2d), ranch polish (2e).
+Do **not** re-enable pending-art items until issue #4 delivers real cutouts.
+Do **not** install Three.js on the ranch “to prepare.”
 
 ---
 
@@ -76,4 +92,4 @@ Highest-priority remaining Phase 2 task (Roadmap 2b):
 
 ## Visual-quality gate
 
-Use the reference direction in the Asset Bible: Essma's dark curly hair and blue bow; instantly recognizable prairie-dog, cacomixtle, and calf silhouettes; warm Sonoran gold/terracotta/cactus/cobalt palette; tactile wood/adobe/textile materials; clear center play zone. The QA threshold is **85/100 with no hard-fail issue**.
+Use the reference direction in the Asset Bible: Essma's dark curly hair and blue bow; instantly recognizable prairie-dog, cacomixtle, and calf silhouettes; warm Sonoran gold/terracotta/cactus/cobalt palette; tactile wood/adobe/textile materials; clear center play zone. The QA threshold is **85/100 with no hard-fail issue**. Clothes must look **worn** (paper-doll occlusion), not merely centered.

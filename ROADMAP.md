@@ -7,16 +7,25 @@ cadence and art throughput before estimating them.
 
 ## Product north star
 
-Essma World should feel like a safe, warm little place a five-year-old can
-return to without being taught how to use it: choose the bright open Rancho on
-the map, make a friend look lovely, arrange a small patio, and discover one
-gentle new thing. It is Mexican-Spanish-first, one-player, local-only, and
-free of ads, purchases, accounts, chat, analytics, scores, streaks, and
-failure pressure.
+Essma World should feel like a safe, warm little **home base** a five-year-old
+can return to without being taught how to use it: choose the bright open
+Rancho on the map, make a friend look lovely, arrange a small patio, and
+discover one gentle new thing. Over time the map also opens **destinations** —
+original mini-worlds (platformer, climb, kart, and friends) she can visit and
+return from — without turning the ranch into a 3D avatar sim.
+
+It is Mexican-Spanish-first, one-player, local-only, and free of ads,
+purchases, accounts, chat, analytics, scores, streaks, and failure pressure
+in the core hub. Destinations may add light challenge; they stay kind,
+local-only, and original (genre-inspired, never cloned franchises).
 
 The release bar is **not** “there are many screens.” It is that a young child
 can understand the next action from the picture and short label, see a joyful
 result quickly, and safely come back to the same ranch later.
+
+**Architecture lock:** hub = React + Phaser 2D paper-doll; destinations =
+isolated `MiniGameModule`s (2D or lazy 3D). Details:
+[`docs/DESTINATIONS.md`](docs/DESTINATIONS.md).
 
 ## What is already done — do not rebuild it
 
@@ -57,9 +66,9 @@ images are direction only and must never become runtime art.
 | Priority | Goal | Why it comes now |
 | --- | --- | --- |
 | **P0** | Make the current creative core genuinely release-ready and test it with children. | A richer game on an unvalidated, visually inconsistent foundation is expensive rework. |
-| **P1** | Add one no-reading-required, two-minute ranch activity and its honest reward loop. | It gives the player a reason to return without opening the map or adding a large world. |
-| **P2** | Make the ranch a cozier, more expressive place with a small story/collection slice. | Build depth from the proven activity and asset pipeline. |
-| **P3** | Open regions and add isolated mini-games, including any Three.js experiment. | These require content, performance, and safety budgets that the core does not yet need. |
+| **P1** | Add one no-reading-required, two-minute ranch activity and its honest reward loop. | It gives the player a reason to return without opening the map or adding a large world. *(Garden done; see P2 for Care / collection.)* |
+| **P2** | Make the ranch a cozier, more expressive place: worn paper-doll fit, collection, story/care slices. | Hub love is the park entrance; destinations feel cheap if clothes still look like stickers. |
+| **P3** | Open regions and ship isolated destinations (Essma Bros → Kong → Kart), 3D only inside modules. | Content, performance, originality, and identity-bridge budgets the hub does not need yet. |
 
 ## P0 — Before merge/release
 
@@ -110,9 +119,18 @@ be complete or explicitly deferred behind a non-player-facing feature flag.
   QA score is **82/100**, below the 85/100 gate. Preserve her approved identity
   direction: young child, light complexion, dark curls, blue bow; do not copy
   a supplied reference pose or artwork.
-- Re-check all v1/v2 layer anchors against the final Essma base and every
-  companion at both dress-up and ranch scale. Correct clipping, unexpected
-  straps, hidden footwear, collision with faces, and poor transparent edges.
+- **Animal paper-doll structure (hub worn bar):** treat sticker-like animal
+  body wearables as an art-structure gap, not an engine gap. For Juancito,
+  Tori, and Anita: author **torso-under / paws-over** (and head-over if
+  needed) the same way Essma uses a hands overlay; re-author body garments as
+  species-shaped wraps with limb openings and matching light. Browser visual
+  gate: must look *worn*, not centered-on-chest. Process:
+  [`docs/ASSET-GENERATION.md`](docs/ASSET-GENERATION.md) “Paper-doll
+  authoring” and [`docs/DESTINATIONS.md`](docs/DESTINATIONS.md).
+- Re-check all keeper layers against the final bases at both dress-up and
+  ranch scale. Correct clipping, unexpected straps, hidden footwear,
+  collision with faces, and poor transparent edges. Do **not** “fix” animal
+  body fit with attachY alone or by installing Three.js on the ranch.
 - Verify the generated asset archives/manifests contain every source and
   runtime/thumbnail derivative. Keep unused but potentially useful generations
   in a clearly labelled, non-runtime source/archive location with provenance;
@@ -262,18 +280,18 @@ child for leaving.
 - Lock state is understandable without color or a long reading task; there is
   no shop, currency, scarcity timer, streak, or purchase surface.
 
-## P2 — Cozy ranch expansion (next slice: Animal Care)
+## P2 — Cozy ranch expansion (hub depth)
 
-P2 adds depth around the proven garden activity. The highest-priority next
-slice is a gentle **Animal Care** interaction (~2 minutes, no failure, no
-timer): feed, water, or brush a ranch friend and earn a cosmetic reward through
-the same validated mini-game host. Ship each row below as a small playable
-slice with its own asset pack and playtest, not as a long backlog sprint.
+P2 deepens the **hub** so dressing, decorating, caring, and collecting feel
+loved before map destinations open. Prefer small playable slices with their
+own asset pack and playtest — not a long backlog sprint.
 
 | Slice | Dependencies | Definition of done |
 | --- | --- | --- |
-| **Ranch activity variety** | P1 reward host and content template | Add brush/feed/water or discovery variants with no neglect/failure state; each has visual instructions, cancel/replay, and a tested reward policy. |
-| **Short story quest** | P1 activity, copy review, story-card format | One 5–8 minute map/ranch story with 2–3 choices, clear return path, no combat or pressure, and a cosmetic/story-clue reward. |
+| **Animal paper-doll worn fit** | Essma hands-overlay pattern; ASSET-GENERATION paper-doll section | Juancito / Tori / Anita body keepers look worn in dress UI + ranch (limb-over-garment, species wrap). Catalog + runtime layer order documented; browser screenshots pass visual gate. |
+| **Collection feedback (Mochila)** | Closet gate (no pending-art) | Picture-first shelf of unlocked wearables/decor; “usar” action; kind lock affordance; keyboard/focus OK. |
+| **Ranch activity variety (Animal Care)** | P1 reward host and content template | Gentle feed/water/brush (~2 min), no neglect/failure; visual instructions; cancel/replay; tested reward policy. |
+| **Short story quest** | Care/garden activity, copy review, story-card format | One 5–8 minute map/ranch story with 2–3 choices, clear return path, no combat or pressure, and a cosmetic/story-clue reward. |
 | **Ranch expression** | Approved character poses and motion budget | Add only useful idles, happy reactions, and pose variants; every animation has reduced-motion/static behavior. |
 | **Decoration sets** | Zone/layout migration plan, final decor QA | Add themed original ranch, garden, and home sets with shadows/placement previews; keep snap zones and undo/reset. |
 | **Photo memory mode** | Parent safety decision, no sharing design | Local-only snapshot/framing view with no automatic gallery upload, social share, camera permission, or child-facing external link. |
@@ -288,19 +306,53 @@ slice with its own asset pack and playtest, not as a long backlog sprint.
 - New cultural content has a factual source and completed documented review.
 - Combined ranch assets stay within the agreed mobile load and memory budget.
 
-## P3 — World expansion and future isolated modules
+## P3 — Destinations and world expansion
 
-### P3.1 Open one second map region
+P3 opens the park: map regions become doors into **isolated destinations**.
+Canonical contract and sequencing live in
+[`docs/DESTINATIONS.md`](docs/DESTINATIONS.md). Do **not** convert the hub to
+3D to unlock these.
 
-Open **one** of the five locked nodes only after P1/P2 validates return play.
-Select it based on a reviewed story purpose rather than the easiest art.
+### P3.1 Destination sequence (genre-inspired, original)
+
+Ship one destination end-to-end before starting the next. Prefer learning the
+hub → play → reward → return loop before racing systems.
+
+| Order | Destination | Genre (inspired-by only) | Engine posture | Definition of done |
+| --- | --- | --- | --- | --- |
+| **1** | **Essma Bros** | Kind platformer | Prefer existing 2D prototype zip after rights/inventory review; wire as `MiniGameModule` | Enter from map/ranch door, play, cancel, fail kindly, exit; optional allowlisted unlock; mobile + desktop; contract tests |
+| **2** | **Essma Kong** | Climb / collect | Isolated 2D or light 3D module | Same destination contract; separate asset budget; no ranch Three.js |
+| **3** | **Essma Kart** | Local kart race | Lazy 3D **inside module only** | Tracks/vehicles original; performance budget; identity bridge Phase B/C (recognizable cast + optional hub cosmetics later) |
+
+**Shared entry requirements (every destination)**
+
+- Written brief per [`docs/DESTINATIONS.md`](docs/DESTINATIONS.md) contract table.
+- Source/rights review for any supplied zip or prototype code.
+- Dynamic import; load / unsupported / cancel / error states; no IndexedDB
+  writes from the module.
+- Independent assets + GPU/memory test matrix; automated tests for every
+  `MiniGameResult` shape.
+- Originality: no Nintendo/third-party assets, UI, level layouts, or trade dress.
+
+**Acceptance criteria**
+
+- A destination failure cannot break map, ranch, saved appearance, or layout.
+- Only the validated host grants allowlisted rewards atomically.
+- Hub JS/image baseline does not download destination media until intentional
+  enter.
+
+### P3.2 Open one second map region (paired with a destination)
+
+Open **one** of the five locked nodes only after hub P2 validates return play
+and a destination brief exists for that node. Select by story purpose, not
+easiest art.
 
 **Suggested production order**
 
-1. Define the reason to visit, visual landmarks, activity, return route, and
-   asset budget for one region.
+1. Define reason to visit, landmarks, which destination (or gentle activity)
+   lives there, return route, and asset budget.
 2. Commission/review one focused scene pack (landscape, interactive objects,
-   2–4 region props/rewards, ambience, navigation states).
+   2–4 props/rewards, ambience, navigation states).
 3. Add travel/loading transition, local save/migration, accessible controls,
    and the same safe mini-game/reward boundary.
 4. Playtest the map: players know which node is open, can return home, and do
@@ -313,29 +365,17 @@ Select it based on a reviewed story purpose rather than the easiest art.
   a concise non-frustrating “pronto” state.
 - Region media is deferred until selected and does not slow the ranch baseline.
 
-### P3.2 Three.js and Essma Bros: isolated only
+### P3.3 Identity bridge (hub → destinations)
 
-Do not install Three.js or place a renderer in the ranch bundle to “prepare.”
-The seam already exists in `app/mini-game.ts`; preserve it.
+Do not block Essma Bros on a universal 3D wardrobe. Evolve cosmetics:
 
-**Entry requirements**
+1. **Phase B:** game-specific character art that reads as the cast.
+2. **Phase C:** map a small set of hub wearable/unlock IDs → destination
+   skins (hat, scarf tint, kart decal).
+3. **Phase D (optional):** shared 3D avatar only with an explicit product
+   approval and dual pipeline budget.
 
-- A real mini-game design brief, success criteria, source/rights review (for
-  Essma Bros or supplied prototype code), threat/privacy review, and a device
-  performance budget.
-- Dynamic import behind a feature flag; explicit load/unsupported/cancel/error
-  states; no direct mutation of IndexedDB or React player state.
-- Independent package and asset budget, GPU/memory test matrix, and automated
-  contract tests for every possible returned result.
-
-**Acceptance criteria**
-
-- A 3D/module failure cannot break map, ranch, saved appearance, or layout.
-- Only the validated host can grant allowlisted rewards atomically.
-- The 2D game does not download the 3D module until the child intentionally
-  enters it, and baseline 2D performance is unchanged.
-
-### P3.3 Later product decisions — require a new approval
+### P3.4 Later product decisions — require a new approval
 
 Cloud backup, accounts, notifications, seasonal calendars, real-money shops,
 social sharing, analytics, or multiplayer are **not roadmap defaults**. Each
@@ -369,27 +409,25 @@ Before a slice is marked complete:
 
 ## First ticket set for the next agent
 
-Work in this order; finish P0 gates before expanding P2 scope.
+Work in this order; prefer hub love before destination scope.
 
-1. Run the full P0 regression matrix on the exact release-candidate commit and
-   create CI/browser smoke coverage for gaps found.
-2. Perform the Essma-base/layer visual pass on all 65 wearables; archive every
-   generated source, revise manifests/catalog QA, and obtain final product
-   approval.
-3. Conduct the small supervised usability study; ship only the child-facing
-   clarity fixes it identifies, then rerun P0 checks.
-4. Make a one-page Animal Care activity brief, reward allowlist, and asset
-   brief; have cultural/content review before art generation.
-5. Implement Animal Care end-to-end through the existing mini-game contract and
-   host validation, then playtest it before adding a second ranch task or
-   opening a region.
+1. **Animal paper-doll worn fit** for Juancito / Tori / Anita body keepers
+   (torso-under / paws-over; browser visual gate). See DESTINATIONS +
+   ASSET-GENERATION.
+2. **Mochila** collection panel (unlocked keepers only; no pending-art).
+3. Run remaining P0 regression / usability items that block release confidence.
+4. Animal Care brief + implement through existing mini-game host; playtest.
+5. Inventory the Essma Bros prototype zip (playability, rights, mobile); draft
+   its destination brief — do **not** merge into the ranch Phaser scene.
+6. Only after one destination contract is green: open one map region door.
 
 ## References
 
-- [Product requirements](outputs/essma-world-production-docs/PRD.md)
-- [Game design](outputs/essma-world-production-docs/GDD.md)
-- [Architecture](outputs/essma-world-production-docs/ARCHITECTURE.md)
-- [Asset Bible](outputs/essma-world-production-docs/ASSET-BIBLE.md)
-- [Test plan](outputs/essma-world-production-docs/TEST-PLAN.md)
-- [Content and safety](outputs/essma-world-production-docs/CONTENT-AND-SAFETY.md)
+- [Hub and destinations](docs/DESTINATIONS.md)
+- [Next agent handoff](docs/NEXT-AGENT-HANDOFF.md)
+- [Asset generation](docs/ASSET-GENERATION.md)
 - [Current asset QA status](docs/ASSET-QA.md)
+- [Agent guide](AGENTS.md)
+- Production package (when present): `outputs/essma-world-production-docs/`
+  or `docs/production/` — PRD, GDD, Architecture, Asset Bible, Test Plan,
+  Content and Safety.

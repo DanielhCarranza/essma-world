@@ -2,53 +2,78 @@
 
 ## Mission
 
-Turn the committed **Playable Core** into a validated, deployable 2D Sites game without expanding the product scope. The child-facing game remains Mexican Spanish, single-player, local-only, and free of ads, purchases, accounts, chat, and analytics.
+Extend the committed **Playable Core** into the **Cozy Ranch Expansion** (Phase 2). The child-facing game remains Mexican Spanish, single-player, local-only, and free of ads, purchases, accounts, chat, and analytics.
 
-Read the production package and visual references first:
+Read the production package first:
 
 1. [`outputs/essma-world-production-docs/README.md`](../outputs/essma-world-production-docs/README.md)
-2. [`PRD.md`](../outputs/essma-world-production-docs/PRD.md)
+2. [`Roadmap.md`](../outputs/essma-world-production-docs/Roadmap.md) — Phase 2 tasks are fully specified here
 3. [`ARCHITECTURE.md`](../outputs/essma-world-production-docs/ARCHITECTURE.md)
 4. [`ASSET-BIBLE.md`](../outputs/essma-world-production-docs/ASSET-BIBLE.md)
-5. [`docs/reference-images/README.md`](reference-images/README.md) and the five supplied images it indexes.
+5. [`docs/reference-images/README.md`](reference-images/README.md) and the five supplied images.
 
-## Current state
+---
 
-- The initial user experience exists in `app/page.tsx`: ranch home, four dress-up targets, ten starter catalog entries, Mexican-Spanish UI, IndexedDB profile save, and parent backup export/import.
-- `public/assets/rancho-de-essma-v1.png` is an original ranch background. Visual QA: **92/100, passed**. It may ship as launch key art, but later production needs the documented parallax layers and catalog/provenance metadata.
-- The current dress-up people/animals are intentionally code-native placeholder dolls. They prove interaction, layering slots, and persistence; replace them with approved original runtime art before release.
-- `phaser` is declared as the planned 2D runtime dependency. The current ranch scene is a React prototype, not yet a Phaser scene. Keep React for accessible menus and inventory panels; move the ranch world and hotspot handling to Phaser once the build is healthy.
-- Future Three.js work is isolated to future mini-games. Do **not** add Three.js to the ranch core.
+## Current state (as of 2026-08-05)
 
-## First task: recover a healthy native build
+### What is working
 
-The prior environment used a WSL shell over a Windows-mounted workspace. Its `npm ci` resolver stalled and left `node_modules` incomplete. This is an environment issue, not a source-code diagnosis.
+- **World map → Rancho → Dress-up → Patio → Save** loop is fully playable.
+- **65 wearable items** across 4 characters (Essma, Juancito, Tori, Anita), 5+ items per slot.
+- **Dress-up panel**: 100vh layout, centered character preview, friend picker in header, equip/unequip toggle (re-tap), "🚫 Quitar" button, scrollable closet.
+- **Layer rendering**: canonical zIndex hierarchy (shoes:25, outfit/body:30, neck/accessory:35, head/hair:40) applied to all 65 items. ESSMA_HANDS_OVERLAY removed for clean dress rendering.
+- **Garden mini-game**: complete with reward contract and React host validation.
+- **IndexedDB save** with caregiver export/import (2-second hold gate).
+- **Settings**: music, SFX, reduced motion honored before any audio or animation starts.
+- Dev server runs via `npx vinext dev --port 3000` (requires `BypassSandbox: true` — the Cloudflare plugin needs port 9229 for debugging, which is blocked in the sandbox).
 
-1. Clone the repository into a native Linux/WSL filesystem location, not a `/mnt/c/...` mounted path.
-2. Run a clean `npm ci`.
-3. Run `npm run build`, `npm test`, and `npm run lint`.
-4. If the lockfile needs normalizing after the clean install, regenerate it from `package.json` and commit that focused repair.
-5. Fix actual TypeScript, rendering, or test failures before adding features.
+### Phase 1 gaps still open
 
-## Next implementation slice
+- ⬜ Visual QA of all 65 wearables at game scale (alpha edges, correct anchors, transparent PNGs)
+- ⬜ Asset provenance records: `productApproved: false` on all v2 wearables — needs a proper product review pass
+- ⬜ Cultural review: `culturalReview: "not-performed"` on all assets — needs a native `es-MX` speaker pass for item names
+- ⬜ Mobile: test dress-up panel + ranch action bar at 390×844 portrait and 844×390 landscape
+- ⬜ First-play guide: make it icon-led, no reading required for a 5-year-old
 
-After validation, deliver the following in a focused change:
+---
 
-- Implement the ranch as a Phaser 2D scene using the approved ranch asset as the initial backdrop.
-- Keep the React dress-up panel, accessibility, Spanish strings, IndexedDB schema, and parent backup contract intact.
-- Route ranch hotspot/character selection through a small typed scene-to-React event interface.
-- Generate or commission original character bases for Essma, Juancito, Tori, and Anita, plus the ten cataloged wearable layers. Submit each production asset to visual QA before use.
-- Add only the asset metadata needed for the playable core: stable ID, target, slot, source/prompt/provenance, thumbnail, runtime file, and `es-MX` display name.
+## Completed this slice — Animal Care Activity ✅
+
+- Ranch action bar **Cuidar** opens `app/care-activity.tsx` (feed Juancito / water Anita / brush Tori; 2 taps each; ¡Gracias!).
+- Rewards via `CARE_REWARD_IDS` + React `applyMiniGameResult`: `wearable.juancito.gorrito-semillas`, `decor.rancho.maceta-corazon`.
+- Garden reward art filled in: `essma.sombrero-jardinero`, `maceta-girasol`.
+- Phaser `celebrateCharacter` prop plays a brief sparkle/pulse (skipped when reduced motion).
+
+## Next implementation slice — Collection Feedback ("Mochila")
+
+Highest-priority remaining Phase 2 task (Roadmap 2b):
+
+1. **Mochila** panel listing earned/unlocked wearables and decor with thumbnails.
+2. Keyboard navigable, labeled; no punishing lock icons for a five-year-old.
+3. Caregiver-readable progress without dense text.
+4. Then Photo mode (2c), expanded decor (2d), ranch polish (2e).
+
+---
 
 ## Non-negotiable acceptance criteria
 
-- A child can select Essma, Juancito, Tori, or Anita from the ranch, equip compatible items, and see the change immediately.
-- Looks, audio/reduced-motion preferences, and settings persist across a normal refresh through IndexedDB.
+- A child can select Essma, Juancito, Tori, or Anita, equip compatible items, place or remove patio decor, and see changes immediately.
+- Looks, patio layout, audio/reduced-motion preferences, and settings persist across a normal refresh through IndexedDB.
 - Parent backup export/import validates data and never exposes a child to external links or personal-data collection.
 - Touch, mouse, and keyboard navigation are usable; important interactions have labels and visible focus.
-- The page builds and tests successfully in the target environment.
+- The page builds and tests successfully: `npm test && npm run lint && npx tsc --noEmit` all pass.
 - No visual asset contains generated text, third-party marks, copied game UI, Nintendo/Switch/ESRB material, or a named-studio imitation.
+
+---
+
+## Dev environment notes
+
+- `npm run dev` / `npx vinext dev --port 3000` **must** be run with `BypassSandbox: true` — port 9229 (Cloudflare plugin debugger) is blocked in the standard sandbox.
+- If the server reports "Port 3000 is in use, trying another one...", kill stale processes first: `pkill -9 -f "serve-static.mjs"; pkill -9 -f "vinext dev"`, then restart.
+- `npm test`, `npm run lint`, `npx tsc --noEmit` all run correctly inside the standard sandbox.
+
+---
 
 ## Visual-quality gate
 
-Use the reference direction already recorded in the Asset Bible: Essma’s dark curly hair and blue bow; instantly recognizable prairie-dog, cacomixtle, and calf silhouettes; warm Sonoran gold/terracotta/cactus/cobalt palette; tactile wood/adobe/textile materials; and a clear center play zone. The QA threshold is 85/100 with no hard-fail issue.
+Use the reference direction in the Asset Bible: Essma's dark curly hair and blue bow; instantly recognizable prairie-dog, cacomixtle, and calf silhouettes; warm Sonoran gold/terracotta/cactus/cobalt palette; tactile wood/adobe/textile materials; clear center play zone. The QA threshold is **85/100 with no hard-fail issue**.

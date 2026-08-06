@@ -18,8 +18,9 @@ create.
 
 1. `docs/NEXT-AGENT-HANDOFF.md` — current state and the next coherent slice.
 2. `ROADMAP.md` and `docs/DESTINATIONS.md` — hub vs destinations, sequencing.
-3. `outputs/essma-world-production-docs/README.md` or `docs/production/` —
-   when present: PRD, GDD, Architecture, Asset Bible, Safety, Test Plan.
+3. `docs/production/README.md` — production-document index, then the
+   relevant PRD, GDD, Architecture, Asset Bible, Safety, Roadmap, and
+   Test Plan.
 4. `docs/reference-images/README.md` and its five images — art direction only.
 5. `docs/ASSET-QA.md` and the generated pack manifests before touching art.
 
@@ -40,7 +41,7 @@ the game promise.
 - `public/assets/**/v*/` — versioned runtime assets and thumbnails.
 - `ROADMAP.md`, `docs/DESTINATIONS.md` — hub vs destinations sequencing.
 - `docs/reference-images/` — private inspiration, never runtime content.
-- `outputs/essma-world-production-docs/` / `docs/production/` — product docs when present.
+- `docs/production/` — checked-in product source of truth.
 - `tests/` — rendered-page, catalog/profile, and mini-game contract coverage.
 
 ## Architecture boundaries

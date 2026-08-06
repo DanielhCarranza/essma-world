@@ -10,10 +10,12 @@ Read first:
 
 1. [`ROADMAP.md`](../ROADMAP.md) — P0–P3 sequencing
 2. [`docs/DESTINATIONS.md`](DESTINATIONS.md) — hub vs destinations, Bros → Kong → Kart
-3. [`docs/ASSET-GENERATION.md`](ASSET-GENERATION.md) — wearable + paper-doll pipeline
-4. [`docs/ASSET-QA.md`](ASSET-QA.md) — honest art status
-5. [`docs/reference-images/README.md`](reference-images/README.md) — direction only
-6. Production package when present: `docs/production/` or `outputs/essma-world-production-docs/`
+3. [`docs/production/README.md`](production/README.md) — production package index
+4. [`docs/ASSET-GENERATION.md`](ASSET-GENERATION.md) — wearable + paper-doll pipeline
+5. [`docs/ASSET-QA.md`](ASSET-QA.md) — honest art status
+6. [`docs/reference-images/README.md`](reference-images/README.md) — direction only
+7. Production deep-dives as needed: [`ARCHITECTURE.md`](production/ARCHITECTURE.md),
+   [`ASSET-BIBLE.md`](production/ASSET-BIBLE.md), [`Roadmap.md`](production/Roadmap.md)
 
 ---
 

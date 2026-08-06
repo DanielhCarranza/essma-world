@@ -69,12 +69,11 @@ test("catalog contains four anchored bases and compatible wearables", () => {
         item.slot
       ],
     );
-    assert.match(item.asset.runtimePath, /^\/assets\/wearables\/v[12]\//);
-    if (item.asset.runtimePath.includes("/v2/"))
-      assert.match(
-        item.asset.thumbnailPath,
-        /^\/assets\/wearables\/v2\/thumbnails\//,
-      );
+    assert.match(item.asset.runtimePath, /^\/assets\/wearables\/v[1-9]\d*\//);
+    assert.match(
+      item.asset.thumbnailPath,
+      /^\/assets\/wearables\/v[1-9]\d*\/thumbnails\//,
+    );
     assert.equal(
       item.asset.provenance.referenceUse,
       "high-level-direction-only",
@@ -404,38 +403,31 @@ test("the shared resolver, reset, and randomize helpers only produce compatible 
   );
 });
 
-test("playable closet excludes procedural pending-art wearables", () => {
-  assert.ok(pendingArtWearableIds.length >= 40);
-  assert.ok(pendingArtWearableIds.includes("wearable.essma.huaraches-piel"));
-  assert.ok(!starterWearableIds.includes("wearable.essma.huaraches-piel"));
+test("playable closet contains all shipped v5 wearables without pending-art placeholders", () => {
+  assert.equal(pendingArtWearableIds.length, 0);
+  assert.ok(starterWearableIds.includes("wearable.essma.huaraches-piel"));
+  assert.ok(starterWearableIds.includes("wearable.essma.tenis-sol"));
   assert.ok(starterWearableIds.includes("wearable.essma.botitas-camino"));
   assert.ok(starterWearableIds.includes("wearable.essma.botitas-cobalto"));
   const starter = createStarterProfile(NOW);
-  assert.ok(!starter.unlocks.itemIds.includes("wearable.essma.tenis-sol"));
+  assert.ok(starter.unlocks.itemIds.includes("wearable.essma.tenis-sol"));
 
-  const bloated = {
+  const validProfile = {
     ...starter,
-    unlocks: {
-      ...starter.unlocks,
-      itemIds: [...starter.unlocks.itemIds, "wearable.essma.huaraches-piel"],
-    },
     appearance: {
       ...starter.appearance,
       essma: {
         ...starter.appearance.essma,
-        shoes: "wearable.essma.huaraches-piel",
+        shoes: "wearable.essma.tenis-sol",
       },
     },
   };
-  const cleaned = validateAndMigrateProfile(bloated, NOW);
+  const cleaned = validateAndMigrateProfile(validProfile, NOW);
   assert.equal(cleaned.ok, true);
   if (!cleaned.ok) return;
-  assert.ok(
-    !cleaned.profile.unlocks.itemIds.includes("wearable.essma.huaraches-piel"),
-  );
   assert.equal(
     cleaned.profile.appearance.essma.shoes,
-    "wearable.essma.botitas-camino",
+    "wearable.essma.tenis-sol",
   );
 });
 

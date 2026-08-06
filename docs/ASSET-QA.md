@@ -92,7 +92,19 @@ Replaced animal **body** keepers with canvas-authored layers extracted from “c
 
 **Honest limits (2026-08-06 follow-up):** v4 improved **placement** vs belly/face stickers, but most animal body items still fail a strict **worn** bar (flat panels, weak wrap, paws not clearly through garments). Root cause is full-body base + single overlay — not Phaser. **Next art slice:** paper-doll (torso-under / paws-over), documented in [`ASSET-GENERATION.md`](ASSET-GENERATION.md) and [`DESTINATIONS.md`](DESTINATIONS.md); tracked on [`ROADMAP.md`](../ROADMAP.md) P0.2 / P2. Do not treat engine migration as the fix. `productApproved` remains false.
 
-`culturalReview` remains `"not-performed"`. Remaining pending-art closet + `botitas-cobalto` still on [issue #4](https://github.com/DanielhCarranza/essma-world/issues/4).
+`culturalReview` remains `"not-performed"`. All remaining pending-art closet items and `botitas-cobalto` resolved on [issue #4](https://github.com/DanielhCarranza/essma-world/issues/4).
+
+### Remaining closet wearables pass (2026-08-06) — v5 (Issue #4)
+
+Replaced all 45 `pending-art` procedural placeholders plus replacement `wearable.essma.botitas-cobalto` covering cutout with storybook-quality cutouts, shipped under `public/assets/wearables/v5/` (with matching 256px thumbnails), fitted via `slot-fit-contract.json` + `scripts/fit_wearable.py`.
+
+- **Essma (13 items):** `monno-azul`, `corona-flores`, `gorrito-campesino`, `tunica-clasica`, `overol-mezclilla`, `vestido-festivo`, `huaraches-piel`, `tenis-sol`, `zapatitos-rojos`, `botitas-cobalto` (replacement), `panuelo-cobalto`, `canastita-flores`, `pulserita-cuentas`.
+- **Juancito (11 items):** `sombrerito-palma`, `casquito-explorador`, `corona-cactus`, `gorrito-noche`, `panuelo-rojo`, `collar-semillas`, `mono-mariposa`, `bufandita-tejida`, `sarape-sonora`, `chaleco-cuero`, `overolcito-trabajo`.
+- **Tori (11 items):** `sombrero-pluma`, `diadema-estrellita`, `gorrito-tejido`, `viserita-sol`, `collar-flores`, `panuelo-amarillo`, `gargantilla-cuentas`, `ponchito-rayas`, `chaleco-denim`, `capita-bosque`, `tunicas-flores`.
+- **Anita (11 items):** `sombrero-vaquero`, `mono-rosa`, `gorrito-campana`, `diadema-girasol`, `campanilla-dorada`, `panuelo-marigold`, `collar-corazon`, `panuelo-verde`, `mantita-tejida`, `overol-granja`, `falda-floreada`.
+
+**Mechanical gate:** `python3 scripts/verify-wearable-fit.py` -> **0 failures** across all 68 items.
+`productApproved` remains `false`; `culturalReview` remains `"not-performed"`.
 
 ## Provenance and processing
 
@@ -101,7 +113,7 @@ Replaced animal **body** keepers with canvas-authored layers extracted from “c
 - Generated pack manifests: `public/assets/wearables/v2/wearables-v2.metadata.json`, `public/assets/decor/v1/decor-v1.metadata.json`, and `public/assets/world/v2/sonora-world-map-v2.metadata.json`
 - Chroma key removal: local image-generation helper with border key, soft matte,
   and despill
-- Layer placement: `scripts/reposition-wearable.py`
+- Layer placement: `scripts/fit_wearable.py` + `public/assets/wearables/slot-fit-contract.json`
 - Audio: locally synthesized original WAV files in `public/assets/audio/v1/`
 
 Catalog QA metadata intentionally keeps `productApproved: false` and

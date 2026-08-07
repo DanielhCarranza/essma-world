@@ -100,6 +100,23 @@ export const RANCH_PLACEMENT_ZONE_IDS = [
 ] as const;
 export type RanchPlacementZoneId = (typeof RANCH_PLACEMENT_ZONE_IDS)[number];
 
+export const RANCH_SCENARIO_IDS = [
+  "patio-central",
+  "jardin-de-flores",
+  "el-huerto",
+  "el-corral",
+  "la-terraza",
+] as const;
+export type RanchScenarioId = (typeof RANCH_SCENARIO_IDS)[number];
+
+export type RanchScenarioDefinition = {
+  id: RanchScenarioId;
+  version: number;
+  kind: "ranch-scenario";
+  locale: LocalizedText;
+  asset: CatalogAsset;
+};
+
 /** Authored, normalized anchors on the 1280 × 720 ranch composition. */
 export type RanchPlacementZone = {
   id: RanchPlacementZoneId;
@@ -1189,6 +1206,104 @@ export const ranchPlacementZones: readonly RanchPlacementZone[] = [
     },
     anchor: { x: 0.08, y: 0.68 },
     footprint: { width: 0.14, height: 0.14 },
+  },
+] as const;
+
+export const ranchScenarios: readonly RanchScenarioDefinition[] = [
+  {
+    id: "patio-central",
+    version: 1,
+    kind: "ranch-scenario",
+    locale: {
+      "es-MX": {
+        name: "Patio Central",
+        description: "El patio principal frente a la casa de adobe.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/scenarios/v1/patio-central.png",
+      "/assets/scenarios/v1/thumbnails/patio-central.png",
+      "Patio central del rancho",
+      releaseCandidateQa(95),
+      1280,
+      720,
+    ),
+  },
+  {
+    id: "jardin-de-flores",
+    version: 1,
+    kind: "ranch-scenario",
+    locale: {
+      "es-MX": {
+        name: "Jardín de Flores",
+        description: "El jardín de flores junto a la casa de adobe.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/scenarios/v1/jardin-de-flores.png",
+      "/assets/scenarios/v1/thumbnails/jardin-de-flores.png",
+      "Jardín de flores del rancho",
+      releaseCandidateQa(94),
+      1280,
+      720,
+    ),
+  },
+  {
+    id: "el-huerto",
+    version: 1,
+    kind: "ranch-scenario",
+    locale: {
+      "es-MX": {
+        name: "El Huerto",
+        description: "El jardín fresco con árboles y sahuaros.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/scenarios/v1/el-huerto.png",
+      "/assets/scenarios/v1/thumbnails/el-huerto.png",
+      "El huerto verde del rancho",
+      releaseCandidateQa(94),
+      1280,
+      720,
+    ),
+  },
+  {
+    id: "el-corral",
+    version: 1,
+    kind: "ranch-scenario",
+    locale: {
+      "es-MX": {
+        name: "El Corral",
+        description: "Un rincón cálido junto a la cerca del rancho.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/scenarios/v1/el-corral.png",
+      "/assets/scenarios/v1/thumbnails/el-corral.png",
+      "El corral del rancho",
+      releaseCandidateQa(93),
+      1280,
+      720,
+    ),
+  },
+  {
+    id: "la-terraza",
+    version: 1,
+    kind: "ranch-scenario",
+    locale: {
+      "es-MX": {
+        name: "La Terraza",
+        description: "La terraza al atardecer bajo el cielo sonorense.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/scenarios/v1/la-terraza.png",
+      "/assets/scenarios/v1/thumbnails/la-terraza.png",
+      "La terraza al atardecer",
+      releaseCandidateQa(94),
+      1280,
+      720,
+    ),
   },
 ] as const;
 

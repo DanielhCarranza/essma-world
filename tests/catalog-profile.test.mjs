@@ -20,6 +20,7 @@ const {
   pendingArtWearableIds,
   ranchDecor,
   ranchPlacementZones,
+  ranchScenarios,
   starterRanchDecorIds,
   starterWearableIds,
   wearables,
@@ -28,11 +29,13 @@ const {
 const {
   canEquip,
   canPlaceRanchDecor,
+  createEmptyRanchLayout,
   createStarterProfile,
   placeRanchDecor,
   PROFILE_SCHEMA_VERSION,
   removeRanchDecor,
   resetRanchLayout,
+  selectRanchScenario,
   undoRanchDecor,
   validateAndMigrateProfile,
 } = profileLib;
@@ -275,7 +278,7 @@ test("a v3 profile preserves appearances, settings, and known unlocks while rece
     result.profile.appearance.tori.head,
     "wearable.tori.gorrito-hojita",
   );
-  assert.deepEqual(result.profile.ranchLayout, { version: 1, placements: [] });
+  assert.deepEqual(result.profile.ranchLayout, createEmptyRanchLayout());
 });
 
 test("ranch placements are compatible, unique, reversible, and never normalize invalid backups", () => {
@@ -285,12 +288,10 @@ test("ranch placements are compatible, unique, reversible, and never normalize i
     "decor.rancho.mesa-picnic",
     "patio.mesquite",
   );
-  assert.deepEqual(first, {
-    version: 1,
-    placements: [
-      { decorId: "decor.rancho.mesa-picnic", zoneId: "patio.mesquite" },
-    ],
-  });
+  assert.equal(first.activeScenarioId, "patio-central");
+  assert.deepEqual(first.placements, [
+    { decorId: "decor.rancho.mesa-picnic", zoneId: "patio.mesquite" },
+  ]);
   assert.equal(
     canPlaceRanchDecor(profile, "decor.rancho.mesa-picnic", "patio.mesquite"),
     true,
@@ -304,18 +305,15 @@ test("ranch placements are compatible, unique, reversible, and never normalize i
     "decor.rancho.mesa-picnic",
     "patio.fogata",
   );
-  assert.deepEqual(moved, {
-    version: 1,
-    placements: [
-      { decorId: "decor.rancho.mesa-picnic", zoneId: "patio.fogata" },
-    ],
-  });
-  assert.deepEqual(removeRanchDecor(moved, "patio.fogata"), {
-    version: 1,
-    placements: [],
-  });
+  assert.equal(moved.activeScenarioId, "patio-central");
+  assert.deepEqual(moved.placements, [
+    { decorId: "decor.rancho.mesa-picnic", zoneId: "patio.fogata" },
+  ]);
+  const removed = removeRanchDecor(moved, "patio.fogata");
+  assert.equal(removed.activeScenarioId, "patio-central");
+  assert.deepEqual(removed.placements, []);
   assert.deepEqual(undoRanchDecor(first), first);
-  assert.deepEqual(resetRanchLayout(), { version: 1, placements: [] });
+  assert.deepEqual(resetRanchLayout(), createEmptyRanchLayout());
   assert.equal(
     placeRanchDecor(
       profile.ranchLayout,
@@ -465,4 +463,42 @@ test("explicit unequip persists across normalize / save cycles", () => {
     resolved.layers.map((item) => item.id),
     ["wearable.essma.vestido-girasol"],
   );
+});
+
+test("ranch scenarios catalog definitions and scenario layout switching work properly", () => {
+  assert.equal(ranchScenarios.length, 5);
+  assert.deepEqual(
+    ranchScenarios.map((s) => s.id),
+    ["patio-central", "jardin-de-flores", "el-huerto", "el-corral", "la-terraza"],
+  );
+
+  const profile = createStarterProfile(NOW);
+  const layoutWithDecor = placeRanchDecor(
+    profile.ranchLayout,
+    "decor.rancho.mesa-picnic",
+    "patio.mesquite",
+  );
+  assert.equal(layoutWithDecor.activeScenarioId, "patio-central");
+  assert.equal(layoutWithDecor.placements.length, 1);
+
+  // Switch to el-huerto
+  const huertoLayout = selectRanchScenario(layoutWithDecor, "el-huerto");
+  assert.equal(huertoLayout.activeScenarioId, "el-huerto");
+  assert.equal(huertoLayout.placements.length, 0);
+
+  // Decorate el-huerto
+  const huertoDecorated = placeRanchDecor(
+    huertoLayout,
+    "decor.rancho.macetas-talavera",
+    "patio.macetas",
+  );
+  assert.equal(huertoDecorated.activeScenarioId, "el-huerto");
+  assert.equal(huertoDecorated.placements.length, 1);
+  assert.equal(huertoDecorated.placements[0].decorId, "decor.rancho.macetas-talavera");
+
+  // Switch back to patio-central — original decor must be preserved!
+  const centralReturned = selectRanchScenario(huertoDecorated, "patio-central");
+  assert.equal(centralReturned.activeScenarioId, "patio-central");
+  assert.equal(centralReturned.placements.length, 1);
+  assert.equal(centralReturned.placements[0].decorId, "decor.rancho.mesa-picnic");
 });

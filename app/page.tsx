@@ -31,7 +31,6 @@ import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
 import { CareActivity, CARE_REWARD_IDS } from "./care-activity";
 import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
 import DestinationShell from "./destination-shell";
-import IntroVideos, { type IntroId } from "./intro-videos";
 import { DESTINATION_REWARD_IDS, type DestinationId } from "./lib/destinations";
 
 type Screen = "map" | "ranch" | "dress" | "destination";
@@ -121,12 +120,6 @@ export default function Home() {
   const [activeDestinationId, setActiveDestinationId] =
     useState<DestinationId | null>(null);
   const [destinationVisit, setDestinationVisit] = useState(0);
-  const [activeIntro, setActiveIntro] = useState<IntroId | null>(() => {
-    if (typeof window === "undefined") return "world";
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ? null
-      : "world";
-  });
 
   async function handleGardenFinish(result: MiniGameResult) {
     setShowGardenActivity(false);
@@ -560,13 +553,7 @@ export default function Home() {
     <main
       className={`game-shell ${profile.settings.reducedMotion ? "reduce-motion" : ""}`}
     >
-      {activeIntro && !profile.settings.reducedMotion ? (
-        <IntroVideos
-          introId={activeIntro}
-          muted={!profile.settings.music}
-          onDone={() => setActiveIntro(null)}
-        />
-      ) : screen === "map" ? (
+      {screen === "map" ? (
         <WorldMap
           initialWelcome={showFirstPlayGuide}
           onEnterRanch={openRanch}

@@ -77,7 +77,6 @@ test("replaces the disposable starter preview", async () => {
   assert.match(page, /Decorar/);
   assert.match(page, /MiniGame|Colección|Opciones para adultos/);
   assert.match(page, /DestinationShell/);
-  assert.match(page, /IntroVideos/);
   assert.match(page, /DESTINATION_REWARD_IDS/);
   assert.match(introVideos, /essma-world-intro-video/);
   assert.match(introVideos, /essma-bros-intro-video/);

@@ -61,11 +61,7 @@ export default function DestinationShell({
 }: DestinationShellProps) {
   const destination = getDestination(destinationId);
   const [load, setLoad] = useState<LoadState>({ status: "loading" });
-  const [showIntro, setShowIntro] = useState(() => {
-    if (context.settings.reducedMotion) return false;
-    if (typeof window === "undefined") return true;
-    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  });
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     let cancelled = false;

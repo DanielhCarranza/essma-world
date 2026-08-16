@@ -10,6 +10,7 @@ import { HUD } from './components/HUD';
 import { ResultsModal } from './components/ResultsModal';
 import { SettingsModal } from './components/SettingsModal';
 import { audio } from './game/audioEngine';
+import { ESSMA_KART_GLB_PATH } from './game/gltfLoader';
 
 export interface EssmaKartAppProps {
   onExit: () => void;
@@ -29,6 +30,10 @@ export default function App({ onExit, onUnsupported, context }: EssmaKartAppProp
   const gameEngineRef = useRef<GameEngine | null>(null);
 
   const [showSettings, setShowSettings] = useState(false);
+
+  useEffect(() => {
+    void fetch(ESSMA_KART_GLB_PATH);
+  }, []);
 
   useEffect(() => {
     if (context?.settings) {

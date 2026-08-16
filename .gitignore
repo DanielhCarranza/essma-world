@@ -55,3 +55,6 @@ next-env.d.ts
 
 # Local browser QA dumps (screenshots, one-off Playwright)
 /.qa-verify/
+
+# Authoring-size destination meshes (compress into public/assets/.../vN/)
+/app/destinations/**/*.glb

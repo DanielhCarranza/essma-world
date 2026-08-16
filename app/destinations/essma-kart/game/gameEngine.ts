@@ -23,6 +23,7 @@ import {
   createWaterfallModel,
   createRainbowModel,
 } from './proceduralModels';
+import { tryLoadGlbKartModel } from './gltfLoader';
 import { buildProceduralTrackRibbon } from './trackMeshGenerator';
 import { SplinePath } from './splinePath';
 import { CharacterId, KartId, Projectile, ItemType } from '../types';
@@ -133,6 +134,7 @@ export class GameEngine {
     );
     this.playerKart.setMesh(playerMesh);
     this.scene.add(playerMesh);
+    void tryLoadGlbKartModel(selectedKart, playerMesh);
     this.allKarts.push(this.playerKart);
 
     // 6b. Spawn Ghost Kart if saved ghost exists

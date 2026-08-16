@@ -41,21 +41,8 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onOpenSettings }) => {
         </button>
       </div>
 
-      {/* 3. Wooden Signpost Menu & Bottom Action */}
+      {/* 3. Start action */}
       <div className="relative z-20 flex flex-col items-center justify-end mb-4 md:mb-6 w-full max-w-xl mx-auto text-center gap-3">
-        {/* Wooden Post Sign Options (PISTAS, PERSONAJES, KARTS, AVENTURA) */}
-        <div className="flex flex-wrap justify-center gap-2 mb-2">
-          {['PISTAS', 'PERSONAJES', 'KARTS', 'AVENTURA'].map((tab) => (
-            <button
-              key={tab}
-              onClick={handleStart}
-              className="bg-[#78350F] hover:bg-[#92400E] text-[#FEF08A] font-black text-xs md:text-sm px-4 py-1.5 rounded-xl border-2 border-[#D97706] shadow-md transition-all hover:scale-105 active:scale-95"
-            >
-              {tab} 🐾
-            </button>
-          ))}
-        </div>
-
         {/* STYLED "¡CORRER!" BUTTON */}
         <button
           onClick={handleStart}
@@ -71,10 +58,8 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({ onOpenSettings }) => {
         </button>
       </div>
 
-      {/* 4. "HECHO CON ❤️ EN SONORA" Plaque (Lower Right - matching Image 1) */}
       <div className="absolute bottom-3 right-3 z-20 bg-amber-950/90 text-amber-200 font-extrabold text-[10px] md:text-xs px-3.5 py-1.5 rounded-xl border-2 border-amber-500/60 shadow-lg flex items-center gap-1.5 backdrop-blur-sm pointer-events-none">
-        <span>HECHO CON ❤️ EN SONORA</span>
-        <span>🌵</span>
+        <span>Hecho con ❤️ de Nino</span>
       </div>
     </div>
   );

@@ -117,6 +117,10 @@ Kong** remains a later climb destination.
   never writes IndexedDB or profile state.
 - **v1 gate:** enter from map cover, race, Salir; empty reward allowlist.
 - **Identity:** Phase B — game-specific cast art; hub cosmetic bridge later.
+- **Hero kart mesh:** runtime GLB at
+  [`public/assets/destinations/essma-kart/v1/essma-kart-model.glb`](../public/assets/destinations/essma-kart/v1/essma-kart-model.glb)
+  (compressed from the authoring file). Keep the 60MB source out of git;
+  re-run `scripts/compress-kart-glb.py` if the sculpt changes.
 
 ### 3. Essma Kong — later
 

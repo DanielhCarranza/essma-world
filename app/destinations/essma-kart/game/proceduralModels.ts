@@ -1,7 +1,5 @@
 import * as THREE from 'three';
 import { CharacterId, KartId } from '../types';
-import { tryLoadGlbKartModel } from './gltfLoader';
-
 import { WheelId, GliderId, PaintId, WHEELS, GLIDERS, PAINTS } from '../content/customizations';
 
 // Helper to create simple Canvas Textures for stylized materials
@@ -425,9 +423,6 @@ export function createKartModel(
   }
 
   group.add(driverGroup);
-
-  // Attempt to load external GLB model if uploaded to /public/models/
-  tryLoadGlbKartModel(kartId, group);
 
   return group;
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { CharacterId, KartId } from '../types';
 import { createKartModel } from '../game/proceduralModels';
+import { tryLoadGlbKartModel } from '../game/gltfLoader';
 
 interface Kart3DPreviewProps {
   kartId: KartId;
@@ -60,9 +61,11 @@ export const Kart3DPreview: React.FC<Kart3DPreviewProps> = ({
     pedestal.receiveShadow = true;
     scene.add(pedestal);
 
-    // Kart Model
     const kartGroup = createKartModel(kartId, characterId);
     scene.add(kartGroup);
+    if (characterId === "essma" || kartId === "heart") {
+      void tryLoadGlbKartModel(kartId, kartGroup);
+    }
 
     let animId: number;
     let angle = 0;

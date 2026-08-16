@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore';
 import { KARTS, CHARACTERS } from '../content/characters';
 import { WHEELS, GLIDERS, PAINTS, WheelId, GliderId, PaintId } from '../content/customizations';
 import { createKartModel } from '../game/proceduralModels';
+import { tryLoadGlbKartModel } from '../game/gltfLoader';
 import { KartId } from '../types';
 import { ArrowLeft, Trophy, Lock, Check, Sparkles, Shield, Zap, Compass, Anchor } from 'lucide-react';
 import { audio } from '../game/audioEngine';
@@ -82,6 +83,7 @@ export const Garage: React.FC = () => {
       save.selectedPaint
     );
     scene.add(kartGroup);
+    void tryLoadGlbKartModel(save.selectedKart, kartGroup);
 
     // Animation Loop
     let animId: number;

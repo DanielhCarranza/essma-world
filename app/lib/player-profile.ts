@@ -9,6 +9,8 @@ import {
   pendingArtWearableIds,
   ranchDecor,
   RanchPlacementZoneId,
+  RanchScenarioId,
+  RANCH_SCENARIO_IDS,
   starterRanchDecorIds,
   starterRegionIds,
   starterWearableIds,
@@ -33,7 +35,9 @@ export type Appearance = Record<
 export type RanchPlacement = { decorId: string; zoneId: RanchPlacementZoneId };
 export type RanchLayout = {
   version: typeof RANCH_LAYOUT_VERSION;
+  activeScenarioId?: RanchScenarioId;
   placements: RanchPlacement[];
+  layouts?: Partial<Record<RanchScenarioId, RanchPlacement[]>>;
 };
 export type ProfileUnlocks = {
   itemIds: string[];
@@ -97,11 +101,199 @@ function isIsoDate(value: unknown): value is string {
   return typeof value === "string" && !Number.isNaN(Date.parse(value));
 }
 
+function isRanchScenarioId(value: unknown): value is RanchScenarioId {
+  return (
+    typeof value === "string" &&
+    (RANCH_SCENARIO_IDS as readonly string[]).includes(value)
+  );
+}
+
 function cloneRanchLayout(layout: RanchLayout): RanchLayout {
+  const clonedLayouts: Partial<Record<RanchScenarioId, RanchPlacement[]>> = {};
+  if (layout.layouts) {
+    for (const [sId, list] of Object.entries(layout.layouts)) {
+      if (list) {
+        clonedLayouts[sId as RanchScenarioId] = list.map((p) => ({ ...p }));
+      }
+    }
+  }
   return {
     version: RANCH_LAYOUT_VERSION,
+    activeScenarioId: layout.activeScenarioId ?? "patio-central",
     placements: layout.placements.map((placement) => ({ ...placement })),
+    layouts: clonedLayouts,
   };
+}
+
+function parsePlacementsList(raw: unknown): RanchPlacement[] | null {
+  if (!Array.isArray(raw)) return null;
+  const occupiedZones = new Set<string>();
+  const placedDecor = new Set<string>();
+  const placements: RanchPlacement[] = [];
+  for (const rawPlacement of raw) {
+    if (
+      !isRecord(rawPlacement) ||
+      typeof rawPlacement.decorId !== "string" ||
+      typeof rawPlacement.zoneId !== "string"
+    )
+      return null;
+    if (
+      !getRanchDecor(rawPlacement.decorId) ||
+      !isCompatibleRanchPlacement(rawPlacement.decorId, rawPlacement.zoneId)
+    )
+      return null;
+    if (
+      occupiedZones.has(rawPlacement.zoneId) ||
+      placedDecor.has(rawPlacement.decorId)
+    )
+      return null;
+    occupiedZones.add(rawPlacement.zoneId);
+    placedDecor.add(rawPlacement.decorId);
+    placements.push({
+      decorId: rawPlacement.decorId,
+      zoneId: rawPlacement.zoneId as RanchPlacementZoneId,
+    });
+  }
+  return placements;
+}
+
+/** Parses a layout without silently fixing it. Invalid data must not be persisted. */
+export function validateRanchLayout(value: unknown): RanchLayout | null {
+  if (!isRecord(value) || value.version !== RANCH_LAYOUT_VERSION) return null;
+
+  const activeScenarioId =
+    typeof value.activeScenarioId === "string" &&
+    isRanchScenarioId(value.activeScenarioId)
+      ? value.activeScenarioId
+      : "patio-central";
+
+  let legacyPlacements: RanchPlacement[] = [];
+  if (value.placements !== undefined) {
+    const parsed = parsePlacementsList(value.placements);
+    if (parsed === null) return null;
+    legacyPlacements = parsed;
+  }
+
+  const layouts: Partial<Record<RanchScenarioId, RanchPlacement[]>> = {};
+
+  if (isRecord(value.layouts)) {
+    for (const scenarioId of RANCH_SCENARIO_IDS) {
+      if (scenarioId in value.layouts) {
+        const parsed = parsePlacementsList(value.layouts[scenarioId]);
+        if (parsed === null) return null;
+        layouts[scenarioId] = parsed;
+      }
+    }
+  }
+
+  if (!layouts["patio-central"]) {
+    layouts["patio-central"] = legacyPlacements;
+  }
+
+  const activePlacements = layouts[activeScenarioId] ?? legacyPlacements;
+
+  return {
+    version: RANCH_LAYOUT_VERSION,
+    activeScenarioId,
+    placements: activePlacements,
+    layouts,
+  };
+}
+
+export function createEmptyRanchLayout(): RanchLayout {
+  return {
+    version: RANCH_LAYOUT_VERSION,
+    activeScenarioId: "patio-central",
+    placements: [],
+    layouts: {
+      "patio-central": [],
+      "el-huerto": [],
+      "el-corral": [],
+      "la-terraza": [],
+    },
+  };
+}
+
+export function selectRanchScenario(
+  layout: RanchLayout,
+  scenarioId: RanchScenarioId,
+): RanchLayout | null {
+  const validLayout = validateRanchLayout(layout);
+  if (!validLayout) return null;
+  const currentLayouts = { ...validLayout.layouts };
+  const currentScenario = validLayout.activeScenarioId ?? "patio-central";
+  currentLayouts[currentScenario] = validLayout.placements;
+
+  const nextPlacements = currentLayouts[scenarioId] ?? [];
+  return {
+    version: RANCH_LAYOUT_VERSION,
+    activeScenarioId: scenarioId,
+    placements: nextPlacements,
+    layouts: {
+      ...currentLayouts,
+      [scenarioId]: nextPlacements,
+    },
+  };
+}
+
+/** Replaces a zone while keeping a decor item unique in the active scenario layout. */
+export function placeRanchDecor(
+  layout: RanchLayout,
+  decorId: string,
+  zoneId: RanchPlacementZoneId,
+): RanchLayout | null {
+  const validLayout = validateRanchLayout(layout);
+  if (!validLayout || !isCompatibleRanchPlacement(decorId, zoneId)) return null;
+  const activeScenarioId = validLayout.activeScenarioId ?? "patio-central";
+  const updatedPlacements = [
+    ...validLayout.placements.filter(
+      (placement) =>
+        placement.zoneId !== zoneId && placement.decorId !== decorId,
+    ),
+    { decorId, zoneId },
+  ];
+  return {
+    version: RANCH_LAYOUT_VERSION,
+    activeScenarioId,
+    placements: updatedPlacements,
+    layouts: {
+      ...validLayout.layouts,
+      [activeScenarioId]: updatedPlacements,
+    },
+  };
+}
+
+export function removeRanchDecor(
+  layout: RanchLayout,
+  zoneId: RanchPlacementZoneId,
+): RanchLayout | null {
+  const validLayout = validateRanchLayout(layout);
+  if (!validLayout) return null;
+  const activeScenarioId = validLayout.activeScenarioId ?? "patio-central";
+  const updatedPlacements = validLayout.placements.filter(
+    (placement) => placement.zoneId !== zoneId,
+  );
+  return {
+    version: RANCH_LAYOUT_VERSION,
+    activeScenarioId,
+    placements: updatedPlacements,
+    layouts: {
+      ...validLayout.layouts,
+      [activeScenarioId]: updatedPlacements,
+    },
+  };
+}
+
+/** A UI can retain the prior layout and pass it here for a validated undo. */
+export function undoRanchDecor(
+  previousLayout: RanchLayout,
+): RanchLayout | null {
+  const validLayout = validateRanchLayout(previousLayout);
+  return validLayout ? cloneRanchLayout(validLayout) : null;
+}
+
+export function resetRanchLayout(): RanchLayout {
+  return createEmptyRanchLayout();
 }
 
 function normalizeSettings(value: unknown): ProfileSettings {
@@ -210,94 +402,6 @@ function validAppearance(
     }
   }
   return true;
-}
-
-/** Parses a layout without silently fixing it. Invalid data must not be persisted. */
-export function validateRanchLayout(value: unknown): RanchLayout | null {
-  if (
-    !isRecord(value) ||
-    value.version !== RANCH_LAYOUT_VERSION ||
-    !Array.isArray(value.placements)
-  )
-    return null;
-  const occupiedZones = new Set<string>();
-  const placedDecor = new Set<string>();
-  const placements: RanchPlacement[] = [];
-  for (const rawPlacement of value.placements) {
-    if (
-      !isRecord(rawPlacement) ||
-      typeof rawPlacement.decorId !== "string" ||
-      typeof rawPlacement.zoneId !== "string"
-    )
-      return null;
-    if (
-      !getRanchDecor(rawPlacement.decorId) ||
-      !isCompatibleRanchPlacement(rawPlacement.decorId, rawPlacement.zoneId)
-    )
-      return null;
-    if (
-      occupiedZones.has(rawPlacement.zoneId) ||
-      placedDecor.has(rawPlacement.decorId)
-    )
-      return null;
-    occupiedZones.add(rawPlacement.zoneId);
-    placedDecor.add(rawPlacement.decorId);
-    placements.push({
-      decorId: rawPlacement.decorId,
-      zoneId: rawPlacement.zoneId as RanchPlacementZoneId,
-    });
-  }
-  return { version: RANCH_LAYOUT_VERSION, placements };
-}
-
-export function createEmptyRanchLayout(): RanchLayout {
-  return { version: RANCH_LAYOUT_VERSION, placements: [] };
-}
-
-/** Replaces a zone while keeping a decor item unique in the patio. */
-export function placeRanchDecor(
-  layout: RanchLayout,
-  decorId: string,
-  zoneId: RanchPlacementZoneId,
-): RanchLayout | null {
-  const validLayout = validateRanchLayout(layout);
-  if (!validLayout || !isCompatibleRanchPlacement(decorId, zoneId)) return null;
-  return {
-    version: RANCH_LAYOUT_VERSION,
-    placements: [
-      ...validLayout.placements.filter(
-        (placement) =>
-          placement.zoneId !== zoneId && placement.decorId !== decorId,
-      ),
-      { decorId, zoneId },
-    ],
-  };
-}
-
-export function removeRanchDecor(
-  layout: RanchLayout,
-  zoneId: RanchPlacementZoneId,
-): RanchLayout | null {
-  const validLayout = validateRanchLayout(layout);
-  if (!validLayout) return null;
-  return {
-    version: RANCH_LAYOUT_VERSION,
-    placements: validLayout.placements.filter(
-      (placement) => placement.zoneId !== zoneId,
-    ),
-  };
-}
-
-/** A UI can retain the prior layout and pass it here for a validated undo. */
-export function undoRanchDecor(
-  previousLayout: RanchLayout,
-): RanchLayout | null {
-  const validLayout = validateRanchLayout(previousLayout);
-  return validLayout ? cloneRanchLayout(validLayout) : null;
-}
-
-export function resetRanchLayout(): RanchLayout {
-  return createEmptyRanchLayout();
 }
 
 export function canPlaceRanchDecor(

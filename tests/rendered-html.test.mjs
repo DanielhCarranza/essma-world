@@ -48,6 +48,7 @@ test("replaces the disposable starter preview", async () => {
     packageJson,
     destinationRegistry,
     introVideos,
+    destinationShell,
   ] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/world-map.tsx", import.meta.url), "utf8"),
@@ -58,6 +59,7 @@ test("replaces the disposable starter preview", async () => {
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../app/lib/destinations.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/intro-videos.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/destination-shell.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.match(profileStore, /indexedDB/);
@@ -80,8 +82,15 @@ test("replaces the disposable starter preview", async () => {
   assert.match(introVideos, /essma-world-intro-video/);
   assert.match(introVideos, /essma-bros-intro-video/);
   assert.match(introVideos, /essma-kart-intro-video/);
+  assert.match(introVideos, /INTRO_VIDEOS/);
+  assert.match(introVideos, /introId/);
   assert.match(introVideos, /controls=\{false\}/);
   assert.match(introVideos, /aria-label="Cerrar"/);
+  assert.match(introVideos, /object-fit: contain|aspectRatio/);
+  assert.match(destinationShell, /IntroVideos/);
+  assert.match(destinationShell, /showIntro/);
+  assert.match(page, /destinationVisit/);
+  assert.doesNotMatch(introVideos, /INTRO_VIDEO_SOURCES/);
   assert.doesNotMatch(page, /from ["']three["']/);
   assert.match(destinationRegistry, /DESTINATION_REWARD_IDS/);
   assert.match(ranchDecorator, /place-decor/);

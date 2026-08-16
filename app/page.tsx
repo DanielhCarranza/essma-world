@@ -31,7 +31,7 @@ import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
 import { CareActivity, CARE_REWARD_IDS } from "./care-activity";
 import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
 import DestinationShell from "./destination-shell";
-import IntroVideos from "./intro-videos";
+import IntroVideos, { type IntroId } from "./intro-videos";
 import { DESTINATION_REWARD_IDS, type DestinationId } from "./lib/destinations";
 
 type Screen = "map" | "ranch" | "dress" | "destination";
@@ -120,9 +120,12 @@ export default function Home() {
   const { play, startMusic, pauseMusic } = useSound(profile.settings);
   const [activeDestinationId, setActiveDestinationId] =
     useState<DestinationId | null>(null);
-  const [showIntro, setShowIntro] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [destinationVisit, setDestinationVisit] = useState(0);
+  const [activeIntro, setActiveIntro] = useState<IntroId | null>(() => {
+    if (typeof window === "undefined") return "world";
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? null
+      : "world";
   });
 
   async function handleGardenFinish(result: MiniGameResult) {
@@ -242,10 +245,6 @@ export default function Home() {
   }, [hydrated, profile]);
 
   useEffect(() => {
-    if (profile.settings.reducedMotion) setShowIntro(false);
-  }, [profile.settings.reducedMotion]);
-
-  useEffect(() => {
     if (!dialog) return;
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -318,12 +317,13 @@ export default function Home() {
   }
 
   function openDestination(id: DestinationId) {
-    setActiveDestinationId(id);
-    setScreen("destination");
     setShowFirstPlayGuide(false);
     setNotice("");
     pauseMusic();
     play("confirm");
+    setActiveDestinationId(id);
+    setDestinationVisit((visit) => visit + 1);
+    setScreen("destination");
   }
 
   async function handleDestinationFinish(result: MiniGameResult) {
@@ -560,10 +560,11 @@ export default function Home() {
     <main
       className={`game-shell ${profile.settings.reducedMotion ? "reduce-motion" : ""}`}
     >
-      {showIntro ? (
+      {activeIntro && !profile.settings.reducedMotion ? (
         <IntroVideos
+          introId={activeIntro}
           muted={!profile.settings.music}
-          onDone={() => setShowIntro(false)}
+          onDone={() => setActiveIntro(null)}
         />
       ) : screen === "map" ? (
         <WorldMap
@@ -574,7 +575,7 @@ export default function Home() {
         />
       ) : screen === "destination" && activeDestinationId ? (
         <DestinationShell
-          key={activeDestinationId}
+          key={`${activeDestinationId}-${destinationVisit}`}
           destinationId={activeDestinationId}
           context={{
             player: {

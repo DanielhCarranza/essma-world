@@ -2,6 +2,7 @@
 
 import { Component, type ComponentType, type ReactNode, useEffect, useState } from "react";
 
+import IntroVideos from "./intro-videos";
 import {
   getDestination,
   type DestinationAppProps,
@@ -60,6 +61,11 @@ export default function DestinationShell({
 }: DestinationShellProps) {
   const destination = getDestination(destinationId);
   const [load, setLoad] = useState<LoadState>({ status: "loading" });
+  const [showIntro, setShowIntro] = useState(() => {
+    if (context.settings.reducedMotion) return false;
+    if (typeof window === "undefined") return true;
+    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -96,6 +102,16 @@ export default function DestinationShell({
   }
 
   const name = destination.locale["es-MX"].name;
+
+  if (showIntro) {
+    return (
+      <IntroVideos
+        introId={destinationId}
+        muted={!context.settings.music}
+        onDone={() => setShowIntro(false)}
+      />
+    );
+  }
 
   return (
     <section

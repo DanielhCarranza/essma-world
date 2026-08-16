@@ -30,8 +30,10 @@ import RanchScenarioSelector from "./ranch-scenario-selector";
 import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
 import { CareActivity, CARE_REWARD_IDS } from "./care-activity";
 import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
+import DestinationShell from "./destination-shell";
+import { DESTINATION_REWARD_IDS, type DestinationId } from "./lib/destinations";
 
-type Screen = "map" | "ranch" | "dress";
+type Screen = "map" | "ranch" | "dress" | "destination";
 type Dialog = "settings" | "collection" | "adult" | "confirm-import" | null;
 
 const cameoMessages = {
@@ -78,7 +80,11 @@ function useSound(settings: PlayerProfile["settings"]) {
     },
     [],
   );
-  return { play, startMusic };
+  const pauseMusic = () => {
+    musicRef.current?.pause();
+    ambienceRef.current?.pause();
+  };
+  return { play, startMusic, pauseMusic };
 }
 
 const STABLE_STARTER_DATE = "2026-08-04T00:00:00.000Z";
@@ -110,7 +116,9 @@ export default function Home() {
   const lastFocusRef = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const adultHoldFrameRef = useRef<number | null>(null);
-  const { play, startMusic } = useSound(profile.settings);
+  const { play, startMusic, pauseMusic } = useSound(profile.settings);
+  const [activeDestinationId, setActiveDestinationId] =
+    useState<DestinationId | null>(null);
 
   async function handleGardenFinish(result: MiniGameResult) {
     setShowGardenActivity(false);
@@ -290,12 +298,67 @@ export default function Home() {
   }
 
   function openRanch() {
+    setActiveDestinationId(null);
     setScreen("ranch");
     setDecorating(false);
     setSelectedDecorId(null);
     setShowFirstPlayGuide(false);
     setNotice("");
     if (profile.settings.music) startMusic();
+    play("confirm");
+  }
+
+  function openDestination(id: DestinationId) {
+    setActiveDestinationId(id);
+    setScreen("destination");
+    setShowFirstPlayGuide(false);
+    setNotice("");
+    pauseMusic();
+    play("confirm");
+  }
+
+  async function handleDestinationFinish(result: MiniGameResult) {
+    const miniGamePlayer = {
+      profileId: profile.profileId,
+      unlockedIds: [...profile.unlocks.itemIds, ...profile.unlocks.decorIds],
+    };
+    await applyMiniGameResult(
+      miniGamePlayer,
+      result,
+      { allowedUnlockIds: new Set(DESTINATION_REWARD_IDS) },
+      {
+        save: async (nextPlayer) => {
+          updateProfile((current) => {
+            const newItemIds = nextPlayer.unlockedIds.filter((id) =>
+              getWearable(id),
+            );
+            const newDecorIds = nextPlayer.unlockedIds.filter((id) =>
+              ranchDecor.some((d) => d.id === id),
+            );
+            return {
+              ...current,
+              unlocks: {
+                ...current.unlocks,
+                itemIds: Array.from(
+                  new Set([...current.unlocks.itemIds, ...newItemIds]),
+                ),
+                decorIds: Array.from(
+                  new Set([...current.unlocks.decorIds, ...newDecorIds]),
+                ),
+              },
+            };
+          });
+        },
+      },
+    );
+
+    setActiveDestinationId(null);
+    setScreen("map");
+    if (result.status === "failed") {
+      setNotice("No se pudo abrir el juego.");
+      play("cancel");
+      return;
+    }
     play("confirm");
   }
   function openDress(character: CharacterId) {
@@ -492,7 +555,25 @@ export default function Home() {
         <WorldMap
           initialWelcome={showFirstPlayGuide}
           onEnterRanch={openRanch}
+          onEnterDestination={openDestination}
           onOpenSettings={() => openDialog("settings")}
+        />
+      ) : screen === "destination" && activeDestinationId ? (
+        <DestinationShell
+          key={activeDestinationId}
+          destinationId={activeDestinationId}
+          context={{
+            player: {
+              profileId: profile.profileId,
+              unlockedIds: [
+                ...profile.unlocks.itemIds,
+                ...profile.unlocks.decorIds,
+              ],
+            },
+            settings: profile.settings,
+            locale: "es-MX",
+          }}
+          onFinish={handleDestinationFinish}
         />
       ) : (
         <>

@@ -34,6 +34,10 @@ the game promise.
 - `app/world-map.tsx` — accessible illustrated map shell.
 - `app/ranch-scene.tsx` — persistent Phaser 2D ranch scene and typed events.
 - `app/dress-up-panel.tsx`, `app/ranch-decorator.tsx` — accessible child UI.
+- `app/destination-shell.tsx` — lazy destination host (enter, Salir, result boundary).
+- `app/lib/destinations.ts` — destination registry, dynamic imports, reward allowlists.
+- `app/destinations/essma-bros/` — 2D canvas platformer module (not Phaser).
+- `app/destinations/essma-kart/` — Three.js kart module (lazy-load only).
 - `app/lib/game-catalog.ts` — versioned authored catalog; never player state.
 - `app/lib/player-profile.ts` / `app/lib/profile-store.ts` — validated
   IndexedDB profile, migrations, import/export.
@@ -54,13 +58,15 @@ the game promise.
   boundary instead of recreating it for a selection or setting change.
 - Semantic React controls must mirror important Phaser actions for keyboard,
   screen-reader, mouse, and touch use. Canvas code must not write profiles.
-- **Hub vs destinations:** ranch/dress-up stay React + Phaser 2D. Future
-  Essma Bros / Kong / Kart (and any Three.js) are **destination modules**
-  only — never a reason to rebuild the closet in 3D. Contract:
+- **Hub vs destinations:** ranch/dress-up stay React + Phaser 2D. Essma Bros,
+  Essma Kart, and future Kong live under `app/destinations/` as **destination
+  modules** only — never a reason to rebuild the closet in 3D. Contract:
   [`docs/DESTINATIONS.md`](docs/DESTINATIONS.md).
-- **Three.js is not a ranch dependency.** If needed later, lazy-load it in an
-  isolated module implementing `MiniGameModule`; give it separate assets and a
-  performance budget. It receives read-only context and returns a result only.
+- **Three.js is Kart-only and lazy.** It is not a ranch dependency. Load it
+  only inside `app/destinations/essma-kart/` with a separate asset and
+  performance budget. Kart may use `localStorage` for non-profile hints; it
+  must not write IndexedDB. It receives read-only context and returns a result
+  only.
 - Only the React host validates rewards and saves the next profile atomically.
   Mini-games must never receive IndexedDB, mutable profile state, or setters.
 

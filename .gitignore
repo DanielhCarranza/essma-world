@@ -49,3 +49,9 @@ next-env.d.ts
 # Wearable fit script backups / local candidate work
 .fit-backups/
 .fit-work/
+
+# Prototype mini-game drops (never ship zips or AI Studio dumps)
+/temp-mini-game/
+
+# Local browser QA dumps (screenshots, one-off Playwright)
+/.qa-verify/

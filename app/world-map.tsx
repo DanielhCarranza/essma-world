@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { destinations, type DestinationId } from "./lib/destinations";
 import styles from "./world-map.module.css";
 
 export type WorldMapProps = {
   /** Opens the only playable destination in this MVP. */
   onEnterRanch: () => void;
+  onEnterDestination: (id: DestinationId) => void;
   /** Opens the app's existing grown-up settings entry point. */
   onOpenSettings: () => void;
   /** Shows a small, optional first-visit greeting without requiring reading. */
@@ -79,6 +81,7 @@ function SettingsMark() {
  */
 export default function WorldMap({
   onEnterRanch,
+  onEnterDestination,
   onOpenSettings,
   initialWelcome = true,
 }: WorldMapProps) {
@@ -167,9 +170,29 @@ export default function WorldMap({
               <span>{place.label}</span>
             </button>
           ))}
+
+          {destinations.map((destination) => (
+            <button
+              className={`${styles.destinationDoor} ${styles[destination.id]}`}
+              key={destination.id}
+              type="button"
+              onClick={() => onEnterDestination(destination.id)}
+              aria-label={`Jugar ${destination.locale["es-MX"].name}`}
+            >
+              <img
+                src={destination.coverPath}
+                alt=""
+                className={styles.destinationCover}
+              />
+              <span>{destination.locale["es-MX"].name}</span>
+              <span className={styles.destinationGo} aria-hidden="true">
+                Jugar
+              </span>
+            </button>
+          ))}
         </div>
 
-        <p className={styles.hint}>Toca el Rancho</p>
+        <p className={styles.hint}>Toca un lugar</p>
         <p
           id="world-map-soon"
           className={styles.liveMessage}

@@ -9,7 +9,7 @@ dress-up/ranch in 3D for Kart/Kong.
 Read first:
 
 1. [`ROADMAP.md`](../ROADMAP.md) — P0–P3 sequencing
-2. [`docs/DESTINATIONS.md`](DESTINATIONS.md) — hub vs destinations, Bros → Kong → Kart
+2. [`docs/DESTINATIONS.md`](DESTINATIONS.md) — hub vs destinations, Bros + Kart in repo; Kong later
 3. [`docs/production/README.md`](production/README.md) — production package index
 4. [`docs/ASSET-GENERATION.md`](ASSET-GENERATION.md) — wearable + paper-doll pipeline
 5. [`docs/ASSET-QA.md`](ASSET-QA.md) — honest art status
@@ -19,7 +19,7 @@ Read first:
 
 ---
 
-## Current state (as of 2026-08-06)
+## Current state (as of 2026-08-15)
 
 ### What is working
 
@@ -30,11 +30,14 @@ Read first:
 - **Garden + Care** mini-games with reward contract and React host validation.
 - **IndexedDB save** with caregiver export/import (2-second hold gate).
 - **Settings**: music, SFX, reduced motion honored before any audio or animation starts.
+- **Destinations (v1 enter/play/Salir):** Essma Bros and Essma Kart are wired as isolated modules under `app/destinations/essma-bros/` and `app/destinations/essma-kart/`, launched from the world-map cover. Host uses [`app/lib/destinations.ts`](../app/lib/destinations.ts) and [`app/destination-shell.tsx`](../app/destination-shell.tsx). v1 reward allowlists are empty.
 
 ### Architecture decision locked ✅
 
-- **Hub** = React + Phaser 2D paper-doll. **Destinations** (Essma Bros, Kong, Kart) = isolated `MiniGameModule`s; Three.js only lazy inside a destination.
-- Identity bridge is phased (game-specific art first; hub cosmetics mapped later). See [`DESTINATIONS.md`](DESTINATIONS.md).
+- **Hub** = React + Phaser 2D paper-doll. **Destinations** = isolated `MiniGameModule`s under `app/destinations/`; **Three.js lazy-loads only in Essma Kart**, never in the ranch.
+- Identity bridge is phased (game-specific art first; hub cosmetics mapped later). Do **not** rebuild ranch/dress-up in 3D. See [`DESTINATIONS.md`](DESTINATIONS.md).
+- **Kart persistence:** `localStorage` hints only (`essma_kart_save`, ghosts); destinations never write IndexedDB.
+- **Prototype zips:** `temp-mini-game/` is gitignored; do not commit archives.
 
 ### Foundations + fit calibration
 
@@ -61,15 +64,19 @@ Read first:
 
 ## Next implementation slices (priority order)
 
+After the destination enter/play/Salir slice, prioritize **hub polish**, not a
+ranch 3D rewrite:
+
 1. **Animal paper-doll worn fit** — torso base + paws overlay; species-shaped body keepers; browser visual gate (`ASSET-GENERATION` “Paper-doll authoring”).
 2. **Mochila** — collection panel for unlocked wearables/decor (exclude `pending-art`).
-3. Remaining P0 usability / CI confidence as needed.
-4. Animal Care polish / brief if still incomplete vs ROADMAP.
-5. **Essma Bros zip inventory** + destination brief — wire as module later; never into ranch Phaser.
-6. Essma Kong, then Essma Kart (lazy 3D only in Kart module) — after hub love and one destination loop.
+3. **Destination polish** — Salir clarity, mobile feel, soften score pressure in Bros/Kart; keep v1 empty reward allowlists until unlock policy is chosen.
+4. Remaining P0 usability / CI confidence as needed.
+5. Animal Care polish / brief if still incomplete vs ROADMAP.
+6. **Essma Kong** — later climb destination; after Bros/Kart loop and hub love are solid.
 
 Do **not** re-enable pending-art items until issue #4 delivers real cutouts.
 Do **not** install Three.js on the ranch “to prepare.”
+Do **not** share hub wearables into destinations yet — game-specific art only for v1.
 
 ---
 

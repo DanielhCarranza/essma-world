@@ -47,6 +47,7 @@ test("replaces the disposable starter preview", async () => {
     layout,
     packageJson,
     destinationRegistry,
+    introVideos,
   ] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/world-map.tsx", import.meta.url), "utf8"),
@@ -56,6 +57,7 @@ test("replaces the disposable starter preview", async () => {
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../app/lib/destinations.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/intro-videos.tsx", import.meta.url), "utf8"),
   ]);
 
   assert.match(profileStore, /indexedDB/);
@@ -73,7 +75,13 @@ test("replaces the disposable starter preview", async () => {
   assert.match(page, /Decorar/);
   assert.match(page, /MiniGame|Colección|Opciones para adultos/);
   assert.match(page, /DestinationShell/);
+  assert.match(page, /IntroVideos/);
   assert.match(page, /DESTINATION_REWARD_IDS/);
+  assert.match(introVideos, /essma-world-intro-video/);
+  assert.match(introVideos, /essma-bros-intro-video/);
+  assert.match(introVideos, /essma-kart-intro-video/);
+  assert.match(introVideos, /controls=\{false\}/);
+  assert.match(introVideos, /aria-label="Cerrar"/);
   assert.doesNotMatch(page, /from ["']three["']/);
   assert.match(destinationRegistry, /DESTINATION_REWARD_IDS/);
   assert.match(ranchDecorator, /place-decor/);

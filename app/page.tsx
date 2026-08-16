@@ -31,6 +31,7 @@ import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
 import { CareActivity, CARE_REWARD_IDS } from "./care-activity";
 import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
 import DestinationShell from "./destination-shell";
+import IntroVideos from "./intro-videos";
 import { DESTINATION_REWARD_IDS, type DestinationId } from "./lib/destinations";
 
 type Screen = "map" | "ranch" | "dress" | "destination";
@@ -119,6 +120,10 @@ export default function Home() {
   const { play, startMusic, pauseMusic } = useSound(profile.settings);
   const [activeDestinationId, setActiveDestinationId] =
     useState<DestinationId | null>(null);
+  const [showIntro, setShowIntro] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   async function handleGardenFinish(result: MiniGameResult) {
     setShowGardenActivity(false);
@@ -235,6 +240,10 @@ export default function Home() {
         setNotice("No pudimos guardar todavía. Puedes seguir jugando."),
       );
   }, [hydrated, profile]);
+
+  useEffect(() => {
+    if (profile.settings.reducedMotion) setShowIntro(false);
+  }, [profile.settings.reducedMotion]);
 
   useEffect(() => {
     if (!dialog) return;
@@ -551,7 +560,12 @@ export default function Home() {
     <main
       className={`game-shell ${profile.settings.reducedMotion ? "reduce-motion" : ""}`}
     >
-      {screen === "map" ? (
+      {showIntro ? (
+        <IntroVideos
+          muted={!profile.settings.music}
+          onDone={() => setShowIntro(false)}
+        />
+      ) : screen === "map" ? (
         <WorldMap
           initialWelcome={showFirstPlayGuide}
           onEnterRanch={openRanch}

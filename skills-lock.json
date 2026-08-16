@@ -91,6 +91,12 @@
       "skillPath": "agent-skills/ui/design-first-ui-prompting/SKILL.md",
       "computedHash": "8f5a040bc9b73645dedf34744a2db7e2ffbcbaa0fe8725a21e6c01112f68ecfa"
     },
+    "game-engine": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/game-engine/SKILL.md",
+      "computedHash": "20057f62cf7a8b2d9f940b3de0b18e5426e8f4bb50e236d36b1033aa0d42c4d8"
+    },
     "generate-reference-inspired-brand-worlds": {
       "source": "MengTo/Skills",
       "sourceType": "github",

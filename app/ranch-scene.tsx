@@ -9,6 +9,7 @@ import {
   ranchDecor,
   ranchPlacementZones,
   RanchPlacementZoneId,
+  ranchScenarios,
   wearables,
 } from "./lib/game-catalog";
 import type { Appearance, RanchLayout } from "./lib/player-profile";
@@ -126,6 +127,9 @@ export default function RanchScene({
 
           preload() {
             this.load.image("rancho", "/assets/rancho-de-essma-v1.png");
+            ranchScenarios.forEach((scenario) =>
+              this.load.image(`scenario:${scenario.id}`, scenario.asset.runtimePath),
+            );
             characters.forEach((character) =>
               this.load.image(
                 `base:${character.id}`,
@@ -148,8 +152,9 @@ export default function RanchScene({
           }
 
           create() {
+            const initialScenarioKey = `scenario:${layout.activeScenarioId ?? "patio-central"}`;
             this.backdrop = this.add
-              .image(0, 0, "rancho")
+              .image(0, 0, this.textures.exists(initialScenarioKey) ? initialScenarioKey : "rancho")
               .setOrigin(0.5)
               .setDepth(0);
             this.shade = this.add
@@ -492,6 +497,16 @@ export default function RanchScene({
 
           updateSnapshot(snapshot: SceneSnapshot) {
             this.pulse?.stop();
+            const scenarioKey = `scenario:${snapshot.layout.activeScenarioId ?? "patio-central"}`;
+            if (this.textures.exists(scenarioKey)) {
+              this.backdrop.setTexture(scenarioKey);
+            }
+            const scenarioDef = ranchScenarios.find(
+              (s) => s.id === (snapshot.layout.activeScenarioId ?? "patio-central"),
+            );
+            if (scenarioDef && this.title) {
+              this.title.setText(scenarioDef.locale["es-MX"].name);
+            }
             this.updateDecor(snapshot.layout);
             ranchPlacementZones.forEach((zone) => {
               const target = this.placementTargets.get(zone.id)!;

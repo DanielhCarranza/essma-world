@@ -18,6 +18,7 @@ import {
   RanchLayout,
   removeRanchDecor,
   resetRanchLayout,
+  selectRanchScenario,
   undoRanchDecor,
   validateAndMigrateProfile,
 } from "./lib/player-profile";
@@ -25,6 +26,7 @@ import { readSavedProfile, writeSavedProfile } from "./lib/profile-store";
 import WorldMap from "./world-map";
 import DressUpPanel from "./dress-up-panel";
 import RanchDecorator, { RanchDecoratorIntent } from "./ranch-decorator";
+import RanchScenarioSelector from "./ranch-scenario-selector";
 import { GardenActivity, GARDEN_REWARD_IDS } from "./garden-activity";
 import { CareActivity, CARE_REWARD_IDS } from "./care-activity";
 import { applyMiniGameResult, type MiniGameResult } from "./mini-game";
@@ -548,35 +550,58 @@ export default function Home() {
                   />
                 )}
                 {!decorating && (
-                  <div className="ranch-action-bar">
-                    <button
-                      className="decorate-launch"
-                      type="button"
-                      onPointerDown={(event) => event.stopPropagation()}
-                      onClick={openDecorator}
-                    >
-                      <span aria-hidden="true">🌼</span>
-                      <b>Decorar</b>
-                    </button>
-                    <button
-                      className="decorate-launch garden-launch"
-                      type="button"
-                      onPointerDown={(event) => event.stopPropagation()}
-                      onClick={() => setShowGardenActivity(true)}
-                    >
-                      <span aria-hidden="true">🌱</span>
-                      <b>Jardín</b>
-                    </button>
-                    <button
-                      className="decorate-launch care-launch"
-                      type="button"
-                      onPointerDown={(event) => event.stopPropagation()}
-                      onClick={() => setShowCareActivity(true)}
-                    >
-                      <span aria-hidden="true">🐾</span>
-                      <b>Cuidar</b>
-                    </button>
-                  </div>
+                  <>
+                    <div className="ranch-scenario-bar flex justify-center w-full my-2">
+                      <RanchScenarioSelector
+                        activeScenarioId={
+                          profile.ranchLayout.activeScenarioId ?? "patio-central"
+                        }
+                        onSelectScenario={(scenarioId) => {
+                          updateProfile((current) => {
+                            const nextLayout = selectRanchScenario(
+                              current.ranchLayout,
+                              scenarioId,
+                            );
+                            if (!nextLayout) return current;
+                            return {
+                              ...current,
+                              ranchLayout: nextLayout,
+                            };
+                          });
+                          play("confirm");
+                        }}
+                      />
+                    </div>
+                    <div className="ranch-action-bar">
+                      <button
+                        className="decorate-launch"
+                        type="button"
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={openDecorator}
+                      >
+                        <span aria-hidden="true">🌼</span>
+                        <b>Decorar</b>
+                      </button>
+                      <button
+                        className="decorate-launch garden-launch"
+                        type="button"
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={() => setShowGardenActivity(true)}
+                      >
+                        <span aria-hidden="true">🌱</span>
+                        <b>Jardín</b>
+                      </button>
+                      <button
+                        className="decorate-launch care-launch"
+                        type="button"
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={() => setShowCareActivity(true)}
+                      >
+                        <span aria-hidden="true">🐾</span>
+                        <b>Cuidar</b>
+                      </button>
+                    </div>
+                  </>
                 )}
                 {showGardenActivity && (
                   <GardenActivity

@@ -60,6 +60,34 @@ test("duplicate rewards are rejected before any profile save", async () => {
   assert.equal(saves.length, 0);
 });
 
+test("destination v1 reward allowlists stay empty so Salir cannot invent unlocks", async () => {
+  const { DESTINATION_REWARD_IDS } = await import("../app/lib/destinations.ts");
+  assert.equal(DESTINATION_REWARD_IDS.length, 0);
+  const emptyPolicy: MiniGameRewardPolicy = {
+    allowedUnlockIds: new Set(DESTINATION_REWARD_IDS),
+  };
+  const { adapter, saves } = persistence();
+  const completedEmpty = await applyMiniGameResult(
+    player,
+    { status: "completed", rewards: [] },
+    emptyPolicy,
+    adapter,
+  );
+  const invented = await applyMiniGameResult(
+    player,
+    {
+      status: "completed",
+      rewards: [{ type: "unlock", catalogId: "wearable.tori.gorrito-hojita" }],
+    },
+    emptyPolicy,
+    adapter,
+  );
+  assert.equal(completedEmpty.status, "saved");
+  assert.deepEqual(completedEmpty.awardedIds, []);
+  assert.deepEqual(invented, { status: "rejected", reason: "invalid-reward", player });
+  assert.equal(saves.length, 0);
+});
+
 test("cancelled and failed mini-games never save or mutate the profile", async () => {
   const { adapter, saves } = persistence();
   const cancelled = await applyMiniGameResult(player, { status: "cancelled" }, policy, adapter);

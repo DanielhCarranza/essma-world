@@ -75,38 +75,60 @@ Before implementation, write a one-page brief covering:
 Code seam: [`app/mini-game.ts`](../app/mini-game.ts). Garden and Care already
 prove the host path; destinations reuse it.
 
+## Destination modules in the repo (v1 inventory)
+
+Two prototypes are checked in as isolated destination modules. Both launch from
+the **world-map cover** (intentional enter). v1 uses **empty reward
+allowlists** — the host contract is wired, but no hub unlocks are granted yet.
+Every destination must expose a child-clear **Salir** path back to the hub.
+
+| Module | Engine | Source | Assets | Persistence |
+| --- | --- | --- | --- | --- |
+| **Essma Bros** | Custom 2D canvas platformer (not Phaser); React `App`; 3 levels; procedural WebAudio | [`app/destinations/essma-bros/`](../app/destinations/essma-bros/) | [`public/assets/destinations/essma-bros/v1/`](../public/assets/destinations/essma-bros/v1/) | None in destination; hub IndexedDB only |
+| **Essma Kart** | Three.js racer; zustand; lazy-load only | [`app/destinations/essma-kart/`](../app/destinations/essma-kart/) | [`public/assets/destinations/essma-kart/v1/`](../public/assets/destinations/essma-kart/v1/) | `localStorage` hints only (`essma_kart_save`, ghost replays); **never IndexedDB** |
+
+**Prototype hygiene:** `temp-mini-game/` holds local zip archives and is
+**gitignored** — do not commit zips. No Gemini-generated runtime assets.
+
+**Future asset sharing (do not build now):** later we may share character or
+wearable art between the hub and destinations via catalog IDs. v1 destinations
+use game-specific art only; do not block shipping on a shared wardrobe pipeline.
+
 ## Planned destinations (sequenced)
 
-Order is by learning cost and hub value, not by ambition. Kart is the dream;
-Bros / Kong teach the enter → play → reward → return loop cheaper.
+Current pair: **Essma Bros + Essma Kart** (enter → play → Salir). **Essma
+Kong** remains a later climb destination.
 
-### 1. Essma Bros (first destination candidate)
+### 1. Essma Bros — in repo
 
 - **Genre:** kind side-scrolling platformer (Mario Bros–*inspired*, original).
-- **Source:** existing prototype zip (inventory + rights review before merge).
-- **Engine guess:** keep as 2D unless the zip already commits otherwise.
-- **Hub link:** map node or ranch “adventure door”; unlock one wearable or
-  decor on gentle completion.
-- **Gate:** playable enter/exit on mobile + desktop; contract tests; no ranch
-  Three.js import.
+- **Engine:** custom 2D canvas (not Phaser); React shell; procedural WebAudio.
+- **v1 gate:** enter from map cover, play three levels, Salir on mobile +
+  desktop; contract tests; no ranch Three.js import.
+- **Rewards:** empty allowlist for v1; optional hub unlock in a later slice.
 
-### 2. Essma Kong (second)
-
-- **Genre:** climb / collect vertical play (Donkey Kong–*inspired*, original).
-- **Why second:** smaller systems surface than racing; good 2.5D or light 3D
-  practice inside an isolated module.
-- **Hub link:** same destination contract; optional unlock tied to care/garden
-  story later.
-
-### 3. Essma Kart (later)
+### 2. Essma Kart — in repo
 
 - **Genre:** local-only kart racing (Mario Kart–*inspired*, original tracks
   and vehicles).
-- **Why last among the three:** tracks, feel, mobile steering, and art cost.
-- **3D:** allowed **inside this module only**, lazy-loaded, with its own
+- **Engine:** Three.js **inside this module only**, lazy-loaded, with its own
   performance budget.
-- **Identity:** Phase B/C bridge — recognizable cast; optional cosmetic from
-  hub unlocks later.
+- **Persistence:** zustand + `localStorage` for kart settings/ghosts only;
+  never writes IndexedDB or profile state.
+- **v1 gate:** enter from map cover, race, Salir; empty reward allowlist.
+- **Identity:** Phase B — game-specific cast art; hub cosmetic bridge later.
+- **Hero kart mesh:** runtime GLB at
+  [`public/assets/destinations/essma-kart/v1/essma-kart-model.glb`](../public/assets/destinations/essma-kart/v1/essma-kart-model.glb)
+  (compressed from the authoring file). Keep the 60MB source out of git;
+  re-run `scripts/compress-kart-glb.py` if the sculpt changes.
+
+### 3. Essma Kong — later
+
+- **Genre:** climb / collect vertical play (Donkey Kong–*inspired*, original).
+- **Why after Bros/Kart:** the enter → play → return loop is proven; Kong adds
+  a smaller vertical slice than racing.
+- **Hub link:** same destination contract; optional unlock tied to care/garden
+  story later.
 
 Locked map places (Desierto, Pueblo, Bosque, Oasis, Valle de flores) remain
 content promises until a destination brief + asset pack + playtest exist for

@@ -1128,6 +1128,61 @@ export const worldRegions: readonly WorldRegionDefinition[] = [
   },
 ] as const;
 
+export const DESTINATION_CATALOG_IDS = [
+  "destination.essma-bros",
+  "destination.essma-kart",
+] as const;
+export type DestinationCatalogId = (typeof DESTINATION_CATALOG_IDS)[number];
+
+export type DestinationCatalogDefinition = {
+  id: DestinationCatalogId;
+  version: number;
+  kind: "destination";
+  locale: LocalizedText;
+  asset: CatalogAsset;
+};
+
+export const destinationCatalog: readonly DestinationCatalogDefinition[] = [
+  {
+    id: "destination.essma-bros",
+    version: 1,
+    kind: "destination",
+    locale: {
+      "es-MX": {
+        name: "Essma Bros",
+        description: "Una aventura en el desierto.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/destinations/essma-bros/v1/cover.png",
+      "/assets/destinations/essma-bros/v1/cover.png",
+      "Portada de Essma Bros",
+      releaseCandidateQa(88),
+      800,
+      450,
+    ),
+  },
+  {
+    id: "destination.essma-kart",
+    version: 1,
+    kind: "destination",
+    locale: {
+      "es-MX": {
+        name: "Essma Kart",
+        description: "Una carrera con amigas.",
+      },
+    },
+    asset: originalAsset(
+      "/assets/destinations/essma-kart/v1/cover.jpg",
+      "/assets/destinations/essma-kart/v1/cover.jpg",
+      "Portada de Essma Kart",
+      releaseCandidateQa(88),
+      800,
+      450,
+    ),
+  },
+];
+
 export const ranchPlacementZones: readonly RanchPlacementZone[] = [
   {
     id: "patio.puerta",

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Promoted prototype destinations; lint the hub host, not AI Studio dumps.
+    "app/destinations/**",
   ]),
 ]);
 

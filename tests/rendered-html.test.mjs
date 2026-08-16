@@ -46,6 +46,7 @@ test("replaces the disposable starter preview", async () => {
     profileStore,
     layout,
     packageJson,
+    destinationRegistry,
   ] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/world-map.tsx", import.meta.url), "utf8"),
@@ -54,6 +55,7 @@ test("replaces the disposable starter preview", async () => {
     readFile(new URL("../app/lib/profile-store.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
+    readFile(new URL("../app/lib/destinations.ts", import.meta.url), "utf8"),
   ]);
 
   assert.match(profileStore, /indexedDB/);
@@ -62,17 +64,25 @@ test("replaces the disposable starter preview", async () => {
   assert.match(worldMap, /Desierto/);
   assert.match(worldMap, /Pueblo/);
   assert.match(worldMap, /Bosque/);
-  assert.match(worldMap, /Toca el Rancho/);
+  assert.match(worldMap, /Toca un lugar/);
+  assert.match(worldMap, /onEnterDestination/);
+  assert.match(destinationRegistry, /Essma Bros/);
+  assert.match(destinationRegistry, /Essma Kart/);
   assert.match(worldMap, /Próximamente|Pronto/);
   assert.match(page, /Mantén presionado 2 segundos/);
   assert.match(page, /Decorar/);
   assert.match(page, /MiniGame|Colección|Opciones para adultos/);
+  assert.match(page, /DestinationShell/);
+  assert.match(page, /DESTINATION_REWARD_IDS/);
+  assert.doesNotMatch(page, /from ["']three["']/);
+  assert.match(destinationRegistry, /DESTINATION_REWARD_IDS/);
   assert.match(ranchDecorator, /place-decor/);
   assert.match(ranchDecorator, /undo-decor/);
   assert.match(layout, /Essma World/);
   assert.match(ranchScene, /rancho-de-essma-v1\.png/);
+  assert.doesNotMatch(ranchScene, /from ["']three["']/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
-  assert.doesNotMatch(packageJson, /three/);
+  assert.doesNotMatch(packageJson, /@google\/genai/);
 
   await assert.rejects(
     access(new URL("../app\/_sites-preview", import.meta.url)),

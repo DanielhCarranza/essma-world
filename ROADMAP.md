@@ -68,7 +68,7 @@ images are direction only and must never become runtime art.
 | **P0** | Make the current creative core genuinely release-ready and test it with children. | A richer game on an unvalidated, visually inconsistent foundation is expensive rework. |
 | **P1** | Add one no-reading-required, two-minute ranch activity and its honest reward loop. | It gives the player a reason to return without opening the map or adding a large world. *(Garden done; see P2 for Care / collection.)* |
 | **P2** | Make the ranch a cozier, more expressive place: worn paper-doll fit, collection, story/care slices. | Hub love is the park entrance; destinations feel cheap if clothes still look like stickers. |
-| **P3** | Open regions and ship isolated destinations (Essma Bros → Kong → Kart), 3D only inside modules. | Content, performance, originality, and identity-bridge budgets the hub does not need yet. |
+| **P3** | Open regions and ship isolated destinations (Essma Bros + Essma Kart now; Kong later), 3D only inside Kart module. | Content, performance, originality, and identity-bridge budgets the hub does not need yet. |
 
 ## P0 — Before merge/release
 
@@ -315,14 +315,16 @@ Canonical contract and sequencing live in
 
 ### P3.1 Destination sequence (genre-inspired, original)
 
-Ship one destination end-to-end before starting the next. Prefer learning the
-hub → play → reward → return loop before racing systems.
+**Current pair:** Essma Bros and Essma Kart are checked in under
+`app/destinations/`. Essma Kong stays later. The **first slice** for both is
+**enter → play → Salir** (world-map cover launch, empty v1 reward allowlists,
+kind cancel/failure, no profile corruption).
 
 | Order | Destination | Genre (inspired-by only) | Engine posture | Definition of done |
 | --- | --- | --- | --- | --- |
-| **1** | **Essma Bros** | Kind platformer | Prefer existing 2D prototype zip after rights/inventory review; wire as `MiniGameModule` | Enter from map/ranch door, play, cancel, fail kindly, exit; optional allowlisted unlock; mobile + desktop; contract tests |
-| **2** | **Essma Kong** | Climb / collect | Isolated 2D or light 3D module | Same destination contract; separate asset budget; no ranch Three.js |
-| **3** | **Essma Kart** | Local kart race | Lazy 3D **inside module only** | Tracks/vehicles original; performance budget; identity bridge Phase B/C (recognizable cast + optional hub cosmetics later) |
+| **1** | **Essma Bros** *(in repo)* | Kind platformer | Custom 2D canvas + React `App` (not Phaser); procedural WebAudio | Enter from map cover, play 3 levels, Salir; mobile + desktop; contract tests; no ranch Three.js |
+| **2** | **Essma Kart** *(in repo)* | Local kart race | Lazy Three.js **inside module only**; zustand; `localStorage` hints/ghosts only | Enter from map cover, race, Salir; separate asset budget; never IndexedDB from module |
+| **3** | **Essma Kong** *(later)* | Climb / collect | Isolated 2D or light 3D module | Same destination contract; separate asset budget; no ranch Three.js |
 
 **Shared entry requirements (every destination)**
 
@@ -417,9 +419,11 @@ Work in this order; prefer hub love before destination scope.
 2. **Mochila** collection panel (unlocked keepers only; no pending-art).
 3. Run remaining P0 regression / usability items that block release confidence.
 4. Animal Care brief + implement through existing mini-game host; playtest.
-5. Inventory the Essma Bros prototype zip (playability, rights, mobile); draft
-   its destination brief — do **not** merge into the ranch Phaser scene.
-6. Only after one destination contract is green: open one map region door.
+5. Polish destination v1: Salir clarity, mobile feel, soften any harsh score
+   pressure in Bros/Kart; keep empty reward allowlists until hub unlock policy
+   is chosen.
+6. Only after enter/play/Salir is green on both destinations: open one map
+   region door or add allowlisted hub rewards.
 
 ## References
 

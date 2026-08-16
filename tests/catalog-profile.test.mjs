@@ -25,6 +25,7 @@ const {
   starterWearableIds,
   wearables,
   worldRegions,
+  destinationCatalog,
 } = catalog;
 const {
   canEquip,
@@ -91,6 +92,21 @@ test("catalog contains four anchored bases and compatible wearables", () => {
       assert.ok(isCompatibleWearable(characterId, slot, itemId));
     }
   }
+});
+
+test("catalog lists Bros and Kart destination covers without opening story regions", () => {
+  assert.deepEqual(
+    destinationCatalog.map((entry) => entry.id),
+    ["destination.essma-bros", "destination.essma-kart"],
+  );
+  for (const entry of destinationCatalog) {
+    assert.match(entry.asset.runtimePath, /^\/assets\/destinations\//);
+    assert.equal(entry.kind, "destination");
+  }
+  assert.equal(
+    worldRegions.filter((region) => region.availability === "locked").length,
+    5,
+  );
 });
 
 test("catalog defines an open Rancho, five locked regions, and reviewed decor placement data", () => {
